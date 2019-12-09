@@ -9,57 +9,51 @@ from .base import Message
 class AsrToggleOn(Message):
     """Activate the ASR component."""
 
-    TOPIC = "hermes/asr/toggleOn"
-
     siteId: str = attr.ib(default="default")
 
-    def topic(self, *args, **kwargs) -> str:
-        return AsrToggleOn.TOPIC
+    @classmethod
+    def topic(cls, *args, **kwargs) -> str:
+        return "hermes/asr/toggleOn"
 
 
 @attr.s
 class AsrToggleOff(Message):
     """Deactivate the ASR component."""
 
-    TOPIC = "hermes/asr/toggleOff"
-
     siteId: str = attr.ib(default="default")
 
-    def topic(self, *args, **kwargs) -> str:
-        return AsrToggleOff.TOPIC
+    @classmethod
+    def topic(cls, *args, **kwargs) -> str:
+        return "hermes/asr/toggleOff"
 
 
 @attr.s
 class AsrStartListening(Message):
     """Tell the ASR component to start listening."""
 
-    TOPIC = "hermes/asr/startListening"
-
     siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
 
-    def topic(self, *args, **kwargs) -> str:
-        return AsrStartListening.TOPIC
+    @classmethod
+    def topic(cls, *args, **kwargs) -> str:
+        return "hermes/asr/startListening"
 
 
 @attr.s
 class AsrStopListening(Message):
     """Tell the ASR component to stop listening."""
 
-    TOPIC = "hermes/asr/stopListening"
-
     siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
 
-    def topic(self, *args, **kwargs) -> str:
-        return AsrStopListening.TOPIC
+    @classmethod
+    def topic(cls, *args, **kwargs) -> str:
+        return "hermes/asr/stopListening"
 
 
 @attr.s
 class AsrTextCaptured(Message):
     """Full ASR transcription results."""
-
-    TOPIC = "hermes/asr/textCaptured"
 
     text: str = attr.ib()
     likelihood: float = attr.ib()
@@ -68,5 +62,6 @@ class AsrTextCaptured(Message):
     siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
 
-    def topic(self, *args, **kwargs) -> str:
-        return AsrTextCaptured.TOPIC
+    @classmethod
+    def topic(cls, *args, **kwargs) -> str:
+        return "hermes/asr/textCaptured"

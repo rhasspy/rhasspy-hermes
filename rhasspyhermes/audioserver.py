@@ -11,5 +11,6 @@ class AudioFrame(Message):
 
     wav_data: bytes = attr.ib()
 
-    def topic(self, siteId: str, *args, **kwargs) -> str:
+    @classmethod
+    def topic(cls, siteId: str, *args, **kwargs) -> str:
         return f"hermes/audioServer/{siteId}/audioFrame"
