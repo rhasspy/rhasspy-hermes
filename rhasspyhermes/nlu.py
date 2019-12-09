@@ -13,6 +13,7 @@ class NluQuery(Message):
     input: str = attr.ib()
     intent_filter: typing.List[str] = attr.ib(factory=list)
     id: [str] = attr.ib(default="")
+    siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
 
     def topic(self, *args, **kwargs) -> str:
@@ -25,6 +26,7 @@ class NluIntent(Message):
     intent: Intent = attr.ib()
     slots: typing.List[Slot] = attr.ib(factory=list)
     id: str = attr.ib(default="")
+    siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
     customData: str = attr.ib(default="")
 
@@ -38,6 +40,7 @@ class NluIntentNotRecognized(Message):
 
     input: str = attr.ib()
     id: str = attr.ib(default="")
+    siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
 
     def topic(self, *args, **kwargs) -> str:
@@ -50,6 +53,7 @@ class NluError(Message):
 
     error: str = attr.ib()
     context: str = attr.ib(default="")
+    siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
 
     def topic(self, *args, **kwargs) -> str:
