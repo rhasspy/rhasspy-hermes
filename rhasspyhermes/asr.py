@@ -1,5 +1,4 @@
-import typing
-
+"""Messages for hermes/asr"""
 import attr
 
 from .base import Message
@@ -12,7 +11,7 @@ class AsrToggleOn(Message):
     siteId: str = attr.ib(default="default")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/asr/toggleOn"
 
 
@@ -23,7 +22,7 @@ class AsrToggleOff(Message):
     siteId: str = attr.ib(default="default")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/asr/toggleOff"
 
 
@@ -35,7 +34,7 @@ class AsrStartListening(Message):
     sessionId: str = attr.ib(default="")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/asr/startListening"
 
 
@@ -47,7 +46,7 @@ class AsrStopListening(Message):
     sessionId: str = attr.ib(default="")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/asr/stopListening"
 
 
@@ -63,5 +62,5 @@ class AsrTextCaptured(Message):
     sessionId: str = attr.ib(default="")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/asr/textCaptured"

@@ -1,3 +1,4 @@
+"""Messages for hermes/nlu"""
 import typing
 
 import attr
@@ -17,7 +18,7 @@ class NluQuery(Message):
     sessionId: str = attr.ib(default="")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/nlu/query"
 
 
@@ -34,7 +35,8 @@ class NluIntent(Message):
     customData: str = attr.ib(default="")
 
     @classmethod
-    def topic(cls, intent_name: str, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
+        intent_name = kwargs["intent_name"]
         return f"hermes/intent/{intent_name}"
 
 
@@ -48,7 +50,7 @@ class NluIntentNotRecognized(Message):
     sessionId: str = attr.ib(default="")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/nlu/intentNotRecognized"
 
 
@@ -62,5 +64,5 @@ class NluError(Message):
     sessionId: str = attr.ib(default="")
 
     @classmethod
-    def topic(cls, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
         return "hermes/error/nlu"

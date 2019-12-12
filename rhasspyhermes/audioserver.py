@@ -1,5 +1,4 @@
-import typing
-
+"""Messages for hermes/audioServer"""
 import attr
 
 from .base import Message
@@ -12,5 +11,6 @@ class AudioFrame(Message):
     wav_data: bytes = attr.ib()
 
     @classmethod
-    def topic(cls, siteId: str, *args, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
+        siteId = kwargs.get("siteId", "default")
         return f"hermes/audioServer/{siteId}/audioFrame"
