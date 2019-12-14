@@ -7,7 +7,7 @@ with open(os.path.join(this_dir, "README.md"), "r") as readme_file:
 
 setuptools.setup(
     name="rhasspy-hermes",
-    version="0.1.0",
+    version="0.1.1",
     author="Michael Hansen",
     author_email="hansen.mike@gmail.com",
     url="https://github.com/synesthesiam/rhasspy-hermes",
