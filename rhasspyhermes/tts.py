@@ -9,7 +9,7 @@ class TtsSay(Message):
     """Send text to be spoken by the text to speech component."""
 
     text: str = attr.ib()
-    lang: str = attr.ib(default="en_GB")
+    lang: str = attr.ib(default="")
     id: str = attr.ib(default="")
     siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
