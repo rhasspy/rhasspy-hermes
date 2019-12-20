@@ -12,7 +12,7 @@ class NluQuery(Message):
     """Send text to the NLU component."""
 
     input: str = attr.ib()
-    intent_filter: typing.List[str] = attr.ib(factory=list)
+    intentFilter: typing.Optional[typing.List[str]] = attr.ib(default=None)
     id: [str] = attr.ib(default="")
     siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")

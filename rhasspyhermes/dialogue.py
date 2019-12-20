@@ -7,14 +7,21 @@ import attr
 from .base import Message
 
 
+class DialogueActionType(str, Enum):
+    """Type of session init objects."""
+
+    ACTION = "action"
+    NOTIFICATION = "notification"
+
+
 @attr.s
 class DialogueAction:
     """Dialogue session action."""
 
     canBeEnqueued: bool = attr.ib()
-    type: str = attr.ib(default="action")
+    type: DialogueActionType = attr.ib(default=DialogueActionType.ACTION)
     text: str = attr.ib(default="")
-    intentFilter: typing.List[str] = attr.ib(factory=list)
+    intentFilter: typing.Optional[typing.List[str]] = attr.ib(default=None)
     sendIntentNotRecognized: bool = attr.ib(default=False)
 
 
@@ -22,8 +29,8 @@ class DialogueAction:
 class DialogueNotification:
     """Dialogue session notification."""
 
-    type: str = attr.ib(default="notification")
     text: str = attr.ib()
+    type: DialogueActionType = attr.ib(default=DialogueActionType.NOTIFICATION)
 
 
 class DialogueSessionTerminationReason(str, Enum):
@@ -93,7 +100,7 @@ class DialogueContinueSession(Message):
     customData: str = attr.ib(default="")
 
     text: str = attr.ib(default="")
-    intentFilter: typing.List[str] = attr.ib(factory=list)
+    intentFilter: typing.Optional[typing.List[str]] = attr.ib(default=None)
     sendIntentNotRecognized: bool = attr.ib(default=False)
     slot: str = attr.ib(default="")
 
@@ -118,13 +125,14 @@ class DialogueEndSession(Message):
 class DialogueSessionEnded(Message):
     """Sent when a dialogue session has ended."""
 
+    termination: DialogueSessionTermination = attr.ib()
     sessionId: str = attr.ib(default="")
     customData: str = attr.ib(default="")
     siteId: str = attr.ib(default="")
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        return "hermes/dialogueManager/endSession"
+        return "hermes/dialogueManager/sessionEnded"
 
 
 @attr.s
@@ -138,4 +146,4 @@ class DialogueIntentNotRecognized(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        return "hermes/nlu/intentNotRecognized"
+        return "hermes/dialogueManager/intentNotRecognized"

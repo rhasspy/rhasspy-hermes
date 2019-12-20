@@ -39,5 +39,5 @@ class HotwordDetected(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        wakeword_id = kwargs["wakeword_id"]
-        return f"hermes/hotword/{wakeword_id}/detected"
+        wakewordId = kwargs["wakewordId"]
+        return f"hermes/hotword/{wakewordId}/detected"
