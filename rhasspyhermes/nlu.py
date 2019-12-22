@@ -1,4 +1,5 @@
 """Messages for hermes/nlu"""
+import re
 import typing
 
 import attr
@@ -26,6 +27,8 @@ class NluQuery(Message):
 class NluIntent(Message):
     """Intent recognized."""
 
+    TOPIC_PATTERN = re.compile(r"^hermes/intent/([^/]+)$")
+
     input: str = attr.ib()
     intent: Intent = attr.ib()
     slots: typing.List[Slot] = attr.ib(factory=list)
@@ -36,8 +39,15 @@ class NluIntent(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        intent_name = kwargs["intent_name"]
-        return f"hermes/intent/{intent_name}"
+        intentName = kwargs["intentName"]
+        return f"hermes/intent/{intentName}"
+
+    @classmethod
+    def get_intentName(cls, topic: str):
+        """Get intentName from a topic"""
+        match = re.match(NluIntent.TOPIC_PATTERN, topic)
+        assert match, "Not an intent topic"
+        return match.group(1)
 
 
 @attr.s

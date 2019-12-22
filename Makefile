@@ -1,11 +1,14 @@
-.PHONY: check dist venv
+.PHONY: check dist venv test
 
 check:
-	flake8 rhasspyhermes/*.py
-	pylint rhasspyhermes/*.py
+	flake8 rhasspyhermes/*.py test/*.py
+	pylint rhasspyhermes/*.py test/*.py
 
 dist:
 	python3 setup.py sdist
+
+test:
+	python3 -m unittest test
 
 venv:
 	rm -rf .venv/

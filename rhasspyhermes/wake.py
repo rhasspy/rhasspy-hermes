@@ -1,4 +1,6 @@
 """Messages for hermes/hotword"""
+import re
+
 import attr
 
 from .base import Message
@@ -31,6 +33,8 @@ class HotwordToggleOff(Message):
 class HotwordDetected(Message):
     """Wake word component has detected a specific wake word."""
 
+    TOPIC_PATTERN = re.compile(r"^hermes/hotword/([^/]+)/detected$")
+
     modelId: str = attr.ib()
     modelVersion: str = attr.ib()
     modelType: str = attr.ib()
@@ -41,3 +45,10 @@ class HotwordDetected(Message):
     def topic(cls, **kwargs) -> str:
         wakewordId = kwargs["wakewordId"]
         return f"hermes/hotword/{wakewordId}/detected"
+
+    @classmethod
+    def get_wakewordId(cls, topic: str):
+        """Get wakewordId from a topic"""
+        match = re.match(HotwordDetected.TOPIC_PATTERN, topic)
+        assert match, "Not a detected topic"
+        return match.group(1)
