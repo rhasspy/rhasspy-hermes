@@ -47,8 +47,13 @@ class HotwordDetected(Message):
         return f"hermes/hotword/{wakewordId}/detected"
 
     @classmethod
-    def get_wakewordId(cls, topic: str):
+    def get_wakewordId(cls, topic: str) -> str:
         """Get wakewordId from a topic"""
         match = re.match(HotwordDetected.TOPIC_PATTERN, topic)
         assert match, "Not a detected topic"
         return match.group(1)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(HotwordDetected.TOPIC_PATTERN, topic) is not None

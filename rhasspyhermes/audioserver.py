@@ -21,11 +21,16 @@ class AudioFrame(Message):
         return f"hermes/audioServer/{siteId}/audioFrame"
 
     @classmethod
-    def get_siteId(cls, topic: str):
+    def get_siteId(cls, topic: str) -> str:
         """Get siteId from a topic"""
         match = re.match(AudioFrame.TOPIC_PATTERN, topic)
         assert match, "Not an audioFrame topic"
         return match.group(1)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(AudioFrame.TOPIC_PATTERN, topic) is not None
 
 
 @attr.s
@@ -43,18 +48,23 @@ class AudioPlayBytes(Message):
         return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
 
     @classmethod
-    def get_siteId(cls, topic: str):
+    def get_siteId(cls, topic: str) -> str:
         """Get siteId from a topic"""
         match = re.match(AudioPlayBytes.TOPIC_PATTERN, topic)
         assert match, "Not a playBytes topic"
         return match.group(1)
 
     @classmethod
-    def get_requestId(cls, topic: str):
+    def get_requestId(cls, topic: str) -> str:
         """Get requestId from a topic"""
         match = re.match(AudioPlayBytes.TOPIC_PATTERN, topic)
         assert match, "Not a playBytes topic"
         return match.group(2)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(AudioPlayBytes.TOPIC_PATTERN, topic) is not None
 
 
 @attr.s
@@ -72,8 +82,13 @@ class AudioPlayFinished(Message):
         return f"hermes/audioServer/{siteId}/playFinished"
 
     @classmethod
-    def get_siteId(cls, topic: str):
+    def get_siteId(cls, topic: str) -> str:
         """Get siteId from a topic"""
         match = re.match(AudioPlayFinished.TOPIC_PATTERN, topic)
         assert match, "Not a playFinished topic"
         return match.group(1)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(AudioPlayFinished.TOPIC_PATTERN, topic) is not None

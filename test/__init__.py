@@ -17,9 +17,15 @@ class HermesTestCase(unittest.TestCase):
         wakewordId = "testWakeWord"
 
         # AudioFrame
+        self.assertTrue(AudioFrame.is_topic(AudioFrame.topic(siteId=siteId)))
         self.assertEqual(AudioFrame.get_siteId(AudioFrame.topic(siteId=siteId)), siteId)
 
         # AudioPlayBytes
+        self.assertTrue(
+            AudioPlayBytes.is_topic(
+                AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
+            )
+        )
         self.assertEqual(
             AudioPlayBytes.get_siteId(
                 AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
@@ -34,16 +40,23 @@ class HermesTestCase(unittest.TestCase):
         )
 
         # AudioPlayFinished
+        self.assertTrue(
+            AudioPlayFinished.is_topic(AudioPlayFinished.topic(siteId=siteId))
+        )
         self.assertEqual(
             AudioPlayFinished.get_siteId(AudioPlayFinished.topic(siteId=siteId)), siteId
         )
 
         # NluIntent
+        self.assertTrue(NluIntent.is_topic(NluIntent.topic(intentName=intentName)))
         self.assertEqual(
             NluIntent.get_intentName(NluIntent.topic(intentName=intentName)), intentName
         )
 
         # HotwordDetected
+        self.assertTrue(
+            HotwordDetected.is_topic(HotwordDetected.topic(wakewordId=wakewordId))
+        )
         self.assertEqual(
             HotwordDetected.get_wakewordId(
                 HotwordDetected.topic(wakewordId=wakewordId)

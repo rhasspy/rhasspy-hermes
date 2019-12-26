@@ -43,11 +43,16 @@ class NluIntent(Message):
         return f"hermes/intent/{intentName}"
 
     @classmethod
-    def get_intentName(cls, topic: str):
+    def get_intentName(cls, topic: str) -> str:
         """Get intentName from a topic"""
         match = re.match(NluIntent.TOPIC_PATTERN, topic)
         assert match, "Not an intent topic"
         return match.group(1)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(NluIntent.TOPIC_PATTERN, topic) is not None
 
 
 @attr.s
