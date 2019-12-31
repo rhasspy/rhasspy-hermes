@@ -5,15 +5,13 @@ check:
 	pylint rhasspyhermes/*.py test/*.py setup.py
 	mypy rhasspyhermes/*.py test/*.py setup.py
 
-coverage:
-	coverage report -m
-	coverage xml
-
 dist:
 	python3 setup.py sdist
 
 test:
 	coverage run -m unittest test
+	coverage report -m
+	coverage xml
 
 venv:
 	rm -rf .venv/
