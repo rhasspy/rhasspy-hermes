@@ -3,12 +3,16 @@
 check:
 	flake8 rhasspyhermes/*.py test/*.py
 	pylint rhasspyhermes/*.py test/*.py
+	mypy rhasspyhermes/*.py test/*.py
+
+coverage:
+	coverage report -m
 
 dist:
 	python3 setup.py sdist
 
 test:
-	python3 -m unittest test
+	coverage run -m unittest test
 
 venv:
 	rm -rf .venv/
