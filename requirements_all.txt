@@ -1,4 +1,5 @@
 attrs==19.1.0
 coverage==5.0
 flake8==3.7.9
+mypy==0.700
 pylint==2.4.4
