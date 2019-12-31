@@ -7,6 +7,7 @@ check:
 
 coverage:
 	coverage report -m
+	coverage xml
 
 dist:
 	python3 setup.py sdist
