@@ -14,7 +14,7 @@ class NluQuery(Message):
 
     input: str = attr.ib()
     intentFilter: typing.Optional[typing.List[str]] = attr.ib(default=None)
-    id: [str] = attr.ib(default="")
+    id: str = attr.ib(default="")
     siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
 
