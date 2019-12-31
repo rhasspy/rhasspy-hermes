@@ -1,9 +1,9 @@
 .PHONY: check dist venv test
 
 check:
-	flake8 rhasspyhermes/*.py test/*.py
-	pylint rhasspyhermes/*.py test/*.py
-	mypy rhasspyhermes/*.py test/*.py
+	flake8 rhasspyhermes/*.py test/*.py setup.py
+	pylint rhasspyhermes/*.py test/*.py setup.py
+	mypy rhasspyhermes/*.py test/*.py setup.py
 
 coverage:
 	coverage report -m
