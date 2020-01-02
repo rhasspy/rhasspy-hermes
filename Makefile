@@ -5,6 +5,7 @@ check:
 	pylint rhasspyhermes/*.py test/*.py setup.py
 	mypy rhasspyhermes/*.py test/*.py setup.py
 	yamllint .
+	pip list --outdated
 
 dist:
 	python3 setup.py sdist
