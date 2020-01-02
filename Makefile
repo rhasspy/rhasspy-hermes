@@ -4,6 +4,7 @@ check:
 	flake8 rhasspyhermes/*.py test/*.py setup.py
 	pylint rhasspyhermes/*.py test/*.py setup.py
 	mypy rhasspyhermes/*.py test/*.py setup.py
+	black .
 	yamllint .
 	pip list --outdated
 
