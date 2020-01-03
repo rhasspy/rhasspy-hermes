@@ -1,3 +1,4 @@
+"""Setup script for rhasspy-hermes package"""
 import os
 import setuptools
 
@@ -16,12 +17,15 @@ setuptools.setup(
     version=version,
     author="Michael Hansen",
     author_email="hansen.mike@gmail.com",
-    url="https://github.com/synesthesiam/rhasspy-hermes",
+    url="https://github.com/rhasspy/rhasspy-hermes",
     packages=setuptools.find_packages(),
     package_data={"rhasspyhermes": ["py.typed"]},
     install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "License :: OSI Approved :: MIT License",
     ],
     long_description=long_description,
