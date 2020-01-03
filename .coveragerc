@@ -5,4 +5,4 @@ omit =
     # Virtual environment in Travis CI
     /home/travis/virtualenv/*
     # Tests
-    test/*
+    tests/*

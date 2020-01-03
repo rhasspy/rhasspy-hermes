@@ -1,4 +1,4 @@
-PYTHON_FILES = rhasspyhermes/*.py test/*.py setup.py
+PYTHON_FILES = rhasspyhermes/*.py tests/*.py setup.py
 
 .PHONY: check dist venv test
 
@@ -14,7 +14,7 @@ dist:
 	python3 setup.py sdist
 
 test:
-	coverage run -m unittest test
+	coverage run -m unittest
 	coverage report -m
 	coverage xml
 
