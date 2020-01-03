@@ -1,5 +1,5 @@
 ---
-dist: buster
+dist: bionic
 services:
   - docker
 language: python
