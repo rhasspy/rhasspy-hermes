@@ -27,6 +27,9 @@ jobs:
       - name: Check code
         run: |
           make check
+      - name: Test code
+        run: |
+          make test
       - name: Make dist
         run: |
           make dist
