@@ -29,7 +29,7 @@ jobs:
           make check
       - name: Test code
         run: |
-          make test          
+          make test
       - name: Make dist
         run: |
           make dist
