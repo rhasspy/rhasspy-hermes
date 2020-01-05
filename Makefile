@@ -1,12 +1,15 @@
 PYTHON_FILES = rhasspyhermes/*.py tests/*.py setup.py
 
-.PHONY: check dist venv test
+.PHONY: black check dist venv test
+
+black:
+	black .
 
 check:
 	flake8 $(PYTHON_FILES)
 	pylint $(PYTHON_FILES)
 	mypy $(PYTHON_FILES)
-	black .
+	black --check .
 	yamllint .
 	pip list --outdated
 
