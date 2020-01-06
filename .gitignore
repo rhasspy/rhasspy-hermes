@@ -6,3 +6,5 @@ coverage.xml
 dist/
 *.egg-info/
 .vscode/
+debian/rhasspy-hermes*
+pyinstaller/
