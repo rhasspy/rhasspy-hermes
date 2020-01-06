@@ -6,6 +6,7 @@ check:
 	flake8 $(PYTHON_FILES)
 	pylint $(PYTHON_FILES)
 	mypy $(PYTHON_FILES)
+	isort $(PYTHON_FILES)
 	black .
 	yamllint -c .yamllint.yml .
 	pip list --outdated
