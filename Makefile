@@ -7,7 +7,7 @@ check:
 	pylint $(PYTHON_FILES)
 	mypy $(PYTHON_FILES)
 	black .
-	yamllint .
+	yamllint -c .yamllint.yml .
 	pip list --outdated
 
 dist:

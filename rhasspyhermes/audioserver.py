@@ -1,5 +1,8 @@
 """Messages for hermes/audioServer"""
+import io
 import re
+import typing
+import wave
 from uuid import uuid4
 
 import attr
@@ -31,6 +34,32 @@ class AudioFrame(Message):
     def is_topic(cls, topic: str) -> bool:
         """True if topic matches template"""
         return re.match(AudioFrame.TOPIC_PATTERN, topic) is not None
+
+    @classmethod
+    def iter_wav_chunked(
+        cls, wav_io: typing.BinaryIO, frames_per_chunk: int
+    ) -> typing.Iterable[bytes]:
+        """Split single WAV into multiple WAV chunks"""
+        with wave.open(wav_io) as in_wav:
+            frames_left = in_wav.getnframes()
+
+            while frames_left > 0:
+                chunk = in_wav.readframes(frames_per_chunk)
+                if not chunk:
+                    break
+
+                # Wrap chunk in WAV
+                with io.BytesIO() as out_io:
+                    out_wav: wave.Wave_write = wave.open(out_io, "wb")
+                    with out_wav:
+                        out_wav.setframerate(in_wav.getframerate())
+                        out_wav.setsampwidth(in_wav.getsampwidth())
+                        out_wav.setnchannels(in_wav.getnchannels())
+                        out_wav.writeframesraw(chunk)
+
+                    yield out_io.getvalue()
+
+                frames_left -= frames_per_chunk
 
 
 @attr.s

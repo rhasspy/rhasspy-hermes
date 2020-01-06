@@ -26,7 +26,8 @@ disable=
   broad-except,
   too-many-nested-blocks,
   invalid-name,
-  too-few-public-methods
+  too-few-public-methods,
+  cell-var-from-loop
 
 [FORMAT]
 expected-line-ending-format=LF
