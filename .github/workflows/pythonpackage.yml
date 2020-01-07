@@ -18,6 +18,11 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install macOS dependencies
+        if: ${{ matrix.os }} == "macos-latest"
+        run: |
+          brew install gettext fakeroot dpkg
+          brew link --force gettext
       - name: Install dependencies
         run: |
           pip install --upgrade pip
