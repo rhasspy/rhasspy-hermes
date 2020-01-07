@@ -15,4 +15,4 @@ fi
 source "${venv}/bin/activate"
 
 export PYTHONPATH="${src_dir}:${PYTHONPATH}"
-python3 -m rhasspy_hermes "$@"
+python3 -m rhasspyhermes "$@"
