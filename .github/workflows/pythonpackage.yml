@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install macOS dependencies
-        if: ${{ matrix.os }} == "macos-latest"
+        if: startsWith(matrix.os, 'macos')
         run: |
           brew install gettext fakeroot dpkg
           brew link --force gettext
