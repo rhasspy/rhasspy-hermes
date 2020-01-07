@@ -1,7 +1,8 @@
 """Tests for rhasspyhermes"""
 import unittest
 
-from rhasspyhermes.audioserver import AudioFrame, AudioPlayBytes, AudioPlayFinished
+from rhasspyhermes.audioserver import (AudioFrame, AudioPlayBytes,
+                                       AudioPlayFinished)
 from rhasspyhermes.nlu import NluIntent
 from rhasspyhermes.wake import HotwordDetected
 
