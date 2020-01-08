@@ -53,7 +53,7 @@ deploy:
 	docker push rhasspy/rhasspy-hermes:$(version)
 
 test:
-	coverage run --source=$(SOURCE) -m unittest
+	coverage run --source=$(SOURCE) -m pytest
 	coverage report -m
 	coverage xml
 

@@ -1,65 +1,52 @@
 """Tests for rhasspyhermes"""
-import unittest
-
 from rhasspyhermes.audioserver import AudioFrame, AudioPlayBytes, AudioPlayFinished
 from rhasspyhermes.nlu import NluIntent
 from rhasspyhermes.wake import HotwordDetected
 
 
-class HermesTestCase(unittest.TestCase):
-    """Tests for rhasspyhermes"""
+def test_topics():
+    """Check get_ methods for topics"""
+    siteId = "testSiteId"
+    requestId = "testRequestId"
+    intentName = "testIntent"
+    wakewordId = "testWakeWord"
 
-    def test_topics(self):
-        """Check get_ methods for topics"""
-        siteId = "testSiteId"
-        requestId = "testRequestId"
-        intentName = "testIntent"
-        wakewordId = "testWakeWord"
+    # AudioFrame
+    assert AudioFrame.is_topic(AudioFrame.topic(siteId=siteId))
+    assert AudioFrame.get_siteId(AudioFrame.topic(siteId=siteId)) == siteId
 
-        # AudioFrame
-        self.assertTrue(AudioFrame.is_topic(AudioFrame.topic(siteId=siteId)))
-        self.assertEqual(AudioFrame.get_siteId(AudioFrame.topic(siteId=siteId)), siteId)
+    # AudioPlayBytes
+    assert AudioPlayBytes.is_topic(
+        AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
+    )
+    assert (
+        AudioPlayBytes.get_siteId(
+            AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
+        )
+        == siteId
+    )
+    assert (
+        AudioPlayBytes.get_requestId(
+            AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
+        )
+        == requestId
+    )
 
-        # AudioPlayBytes
-        self.assertTrue(
-            AudioPlayBytes.is_topic(
-                AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
-            )
-        )
-        self.assertEqual(
-            AudioPlayBytes.get_siteId(
-                AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
-            ),
-            siteId,
-        )
-        self.assertEqual(
-            AudioPlayBytes.get_requestId(
-                AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
-            ),
-            requestId,
-        )
+    # AudioPlayFinished
+    assert AudioPlayFinished.is_topic(AudioPlayFinished.topic(siteId=siteId))
+    assert (
+        AudioPlayFinished.get_siteId(AudioPlayFinished.topic(siteId=siteId)) == siteId
+    )
 
-        # AudioPlayFinished
-        self.assertTrue(
-            AudioPlayFinished.is_topic(AudioPlayFinished.topic(siteId=siteId))
-        )
-        self.assertEqual(
-            AudioPlayFinished.get_siteId(AudioPlayFinished.topic(siteId=siteId)), siteId
-        )
+    # NluIntent
+    assert NluIntent.is_topic(NluIntent.topic(intentName=intentName))
+    assert (
+        NluIntent.get_intentName(NluIntent.topic(intentName=intentName)) == intentName
+    )
 
-        # NluIntent
-        self.assertTrue(NluIntent.is_topic(NluIntent.topic(intentName=intentName)))
-        self.assertEqual(
-            NluIntent.get_intentName(NluIntent.topic(intentName=intentName)), intentName
-        )
-
-        # HotwordDetected
-        self.assertTrue(
-            HotwordDetected.is_topic(HotwordDetected.topic(wakewordId=wakewordId))
-        )
-        self.assertEqual(
-            HotwordDetected.get_wakewordId(
-                HotwordDetected.topic(wakewordId=wakewordId)
-            ),
-            wakewordId,
-        )
+    # HotwordDetected
+    assert HotwordDetected.is_topic(HotwordDetected.topic(wakewordId=wakewordId))
+    assert (
+        HotwordDetected.get_wakewordId(HotwordDetected.topic(wakewordId=wakewordId))
+        == wakewordId
+    )
