@@ -1,5 +1,6 @@
 SHELL := bash
-PYTHON_FILES = rhasspyhermes/*.py tests/*.py setup.py
+SOURCE = rhasspyhermes
+PYTHON_FILES = $(SOURCE)/*.py tests/*.py setup.py
 SHELL_FILES = bin/* debian/bin/*
 
 .PHONY: reformat check dist venv test pyinstaller debian deploy
@@ -52,7 +53,7 @@ deploy:
 	docker push rhasspy/rhasspy-hermes:$(version)
 
 test:
-	coverage run --source=rhasspyhermes -m unittest
+	coverage run --source=$(SOURCE) -m unittest
 	coverage report -m
 	coverage xml
 
