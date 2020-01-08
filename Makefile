@@ -1,7 +1,9 @@
 SHELL := bash
-PYTHON_FILES = rhasspyhermes/*.py tests/*.py setup.py
+SOURCE = rhasspyhermes
+PYTHON_FILES = $(SOURCE)/*.py tests/*.py setup.py
+SHELL_FILES = bin/* debian/bin/*
 
-.PHONY: black check dist venv test pyinstaller debian deploy
+.PHONY: reformat check dist venv test pyinstaller debian deploy
 
 version := $(shell cat VERSION)
 architecture := $(shell dpkg-architecture | grep DEB_BUILD_ARCH= | sed 's/[^=]\+=//')
@@ -9,16 +11,18 @@ architecture := $(shell dpkg-architecture | grep DEB_BUILD_ARCH= | sed 's/[^=]\+
 debian_package := rhasspy-hermes_$(version)_$(architecture)
 debian_dir := debian/$(debian_package)
 
-black:
+reformat:
 	black .
+	isort $(PYTHON_FILES)
 
 check:
 	flake8 $(PYTHON_FILES)
 	pylint $(PYTHON_FILES)
 	mypy $(PYTHON_FILES)
 	black --check .
+	isort --check-only $(PYTHON_FILES)
+	bashate $(SHELL_FILES)
 	yamllint .
-	isort $(PYTHON_FILES)
 	pip list --outdated
 
 dist: sdist debian
@@ -49,7 +53,7 @@ deploy:
 	docker push rhasspy/rhasspy-hermes:$(version)
 
 test:
-	coverage run -m unittest
+	coverage run --source=$(SOURCE) -m unittest
 	coverage report -m
 	coverage xml
 
