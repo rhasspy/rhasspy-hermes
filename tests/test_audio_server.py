@@ -1,22 +1,18 @@
-"""Tests for rhasspyhermes"""
+"""Tests for rhasspyhermes.audioserver"""
 from rhasspyhermes.audioserver import AudioFrame, AudioPlayBytes, AudioPlayFinished
 
-from rhasspyhermes.nlu import NluIntent
-from rhasspyhermes.wake import HotwordDetected
+siteId = "testSiteId"
+requestId = "testRequestId"
 
 
-def test_topics():
-    """Check get_ methods for topics"""
-    siteId = "testSiteId"
-    requestId = "testRequestId"
-    intentName = "testIntent"
-    wakewordId = "testWakeWord"
-
-    # AudioFrame
+def test_audio_frame():
+    """Test AudioFrame."""
     assert AudioFrame.is_topic(AudioFrame.topic(siteId=siteId))
     assert AudioFrame.get_siteId(AudioFrame.topic(siteId=siteId)) == siteId
 
-    # AudioPlayBytes
+
+def test_audio_play_bytes():
+    """Test AudioPlayBytes."""
     assert AudioPlayBytes.is_topic(
         AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
     )
@@ -33,21 +29,10 @@ def test_topics():
         == requestId
     )
 
-    # AudioPlayFinished
+
+def test_audio_play_finished():
+    """Test AudioPlayFinished."""
     assert AudioPlayFinished.is_topic(AudioPlayFinished.topic(siteId=siteId))
     assert (
         AudioPlayFinished.get_siteId(AudioPlayFinished.topic(siteId=siteId)) == siteId
-    )
-
-    # NluIntent
-    assert NluIntent.is_topic(NluIntent.topic(intentName=intentName))
-    assert (
-        NluIntent.get_intentName(NluIntent.topic(intentName=intentName)) == intentName
-    )
-
-    # HotwordDetected
-    assert HotwordDetected.is_topic(HotwordDetected.topic(wakewordId=wakewordId))
-    assert (
-        HotwordDetected.get_wakewordId(HotwordDetected.topic(wakewordId=wakewordId))
-        == wakewordId
     )

@@ -37,7 +37,7 @@ class NluIntent(Message):
     sessionId: str = attr.ib(default="")
     customData: str = attr.ib(default="")
     asrTokens: typing.List[str] = attr.ib(factory=list)
-    asrConficence: float = attr.ib(default=1.0)
+    asrConfidence: float = attr.ib(default=1.0)
 
     @classmethod
     def topic(cls, **kwargs) -> str:
