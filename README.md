@@ -20,7 +20,7 @@ python3 -m rhasspyhermes --help
 
 to see the available commands and their options. You can add a `--debug` argument to see DEBUG information.
 
-Each command will print the appropriate Hermes response message(s) as JSON (one per line). With the `--print-topics` flag, the MQTT topic will be printed before each JSON message. 
+Each command will print the appropriate Hermes response message(s) as JSON (one per line). With the `--print-topics` flag, the MQTT topic will be printed before each JSON message.
 
 ### Examples
 
