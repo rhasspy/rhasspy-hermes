@@ -9,4 +9,3 @@ class Message(ABC):
     @abstractmethod
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
-        pass
