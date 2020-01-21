@@ -10,13 +10,13 @@ import attr
 from .base import Message
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AudioFrame(Message):
     """Captured sound frame."""
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/audioFrame$")
 
-    wav_data: bytes = attr.ib()
+    wav_data: bytes
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -62,13 +62,13 @@ class AudioFrame(Message):
                 frames_left -= frames_per_chunk
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AudioPlayBytes(Message):
     """Play WAV sound on specific site."""
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/playBytes/([^/]+)$")
 
-    wav_data: bytes = attr.ib()
+    wav_data: bytes
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -96,14 +96,14 @@ class AudioPlayBytes(Message):
         return re.match(AudioPlayBytes.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AudioPlayFinished(Message):
     """Sent when audio service has finished playing a sound."""
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/playFinished$")
 
-    id: str = attr.ib(default="")
-    sessionId: str = attr.ib(default="")
+    id: str = ""
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
