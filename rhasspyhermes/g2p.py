@@ -13,23 +13,11 @@ class G2pPronounce(Message):
     id: str = attr.ib(default="")
 
     # Words to guess pronunciations for
-    words: [str] = attr.ib(default="")
+    words: typing.List[str] = attr.ib(factory=list)
 
     # Hermes siteId/sessionId
     siteId: str = attr.ib(default="default")
     sessionId: str = attr.ib(default="")
-
-    # G2P models to use when guessing.
-    # None = don't guess (only dictionaries)
-    # Empty = use all available models
-    # Non-empty = use specific models
-    models: typing.Optional[typing.List[str]] = attr.ib(factory=list)
-
-    # Pronunciation dictionaries to use.
-    # None = don't use a dictionary (only guess)
-    # Empty = use all available dictionaries
-    # Non-Empty = use only specific dictionaries
-    dictionaries: typing.Optional[typing.List[str]] = attr.ib(factory=list)
 
     # Maximum number of guesses to return
     numGuesses: int = attr.ib(default=5)
@@ -42,26 +30,20 @@ class G2pPronounce(Message):
 
 @attr.s
 class G2pPronunciation:
-    """Phonetic pronunciation for a single word"""
+    """Phonetic pronunciation for a single word (in G2pPhonemes)."""
 
-    word: str = attr.ib()
+    word: str = attr.ib(default="")
 
     # Phonetic pronunciation for word
-    phonemes: typing.List[str] = attr.ib()
-
-    # G2P model id used to guess pronunciation
-    modelId: typing.Optional[str] = attr.ib(default=None)
-
-    # Phonetic dictionary used for pronunciation
-    dictionaryId: typing.Optional[str] = attr.ib(default=None)
+    phonemes: typing.List[str] = attr.ib(factory=list)
 
 
 @attr.s
 class G2pPhonemes:
-    """Phonetic pronunciations for words."""
+    """Response to G2pPronunciation."""
 
     # Guessed or looked up pronunciations
-    phonemes: typing.Dict[str, typing.List[G2pPronunciation]] = attr.ib()
+    phonemes: typing.Dict[str, typing.List[G2pPronunciation]] = attr.ib(factory=dict)
 
     # User id from request
     id: str = attr.ib(default="")
