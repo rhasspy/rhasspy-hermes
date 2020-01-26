@@ -32,18 +32,22 @@ class G2pPronounce(Message):
 class G2pPronunciation:
     """Phonetic pronunciation for a single word (in G2pPhonemes)."""
 
-    word: str = attr.ib(default="")
-
     # Phonetic pronunciation for word
     phonemes: typing.List[str] = attr.ib(factory=list)
 
+    # True if this pronunciation was guessed using a g2p model.
+    # False if it came from a pronunciation dictionary.
+    guessed: bool = attr.ib(default=False)
+
 
 @attr.s
-class G2pPhonemes:
+class G2pPhonemes(Message):
     """Response to G2pPronunciation."""
 
     # Guessed or looked up pronunciations
-    phonemes: typing.Dict[str, typing.List[G2pPronunciation]] = attr.ib(factory=dict)
+    wordPhonemes: typing.Dict[str, typing.List[G2pPronunciation]] = attr.ib(
+        factory=dict
+    )
 
     # User id from request
     id: str = attr.ib(default="")
@@ -56,6 +60,20 @@ class G2pPhonemes:
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic"""
         return "rhasspy/g2p/phonemes"
+
+    @classmethod
+    def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
+        """Construct message from dictionary."""
+        message = super().from_dict(message_dict)
+        message.wordPhonemes = {
+            word: [
+                G2pPronunciation(**word_pron)
+                for word_pron in message.wordPhonemes[word]
+            ]
+            for word in message.wordPhonemes
+        }
+
+        return message
 
 
 @attr.s

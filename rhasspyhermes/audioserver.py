@@ -3,6 +3,7 @@ import io
 import re
 import typing
 import wave
+from enum import Enum
 from uuid import uuid4
 
 import attr
@@ -121,3 +122,50 @@ class AudioPlayFinished(Message):
     def is_topic(cls, topic: str) -> bool:
         """True if topic matches template"""
         return re.match(AudioPlayFinished.TOPIC_PATTERN, topic) is not None
+
+
+# -----------------------------------------------------------------------------
+
+
+class AudioDeviceMode(str, Enum):
+    """Input/output mode of an audio device"""
+
+    INPUT = "input"
+    OUTPUT = "output"
+
+
+class AudioDevice:
+    """Description of an audio device."""
+
+    mode: AudioDeviceMode = attr.ib()
+    id: str = attr.ib()
+    name: str = attr.ib()
+    description: str = attr.ib()
+    working: bool = attr.ib(default=True)
+
+
+@attr.s
+class AudioGetDevices(Message):
+    """Get details for audio input devices."""
+
+    modes: typing.List[AudioDeviceMode] = attr.ib()
+    id: str = attr.ib(default="")
+    siteId: str = attr.ib(default="default")
+    test: bool = attr.ib(default=False)
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        return "rhasspy/audioServer/getDevices"
+
+
+@attr.s
+class AudioDevices(Message):
+    """Response to getDevices."""
+
+    id: str = attr.ib(default="")
+    siteId: str = attr.ib(default="default")
+    devices: typing.List[AudioDevice] = attr.ib(factory=list)
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        return "rhasspy/audioServer/devices"
