@@ -4,29 +4,29 @@ import typing
 import attr
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class Intent:
     """Intent name and confidence."""
 
-    intentName: str = attr.ib()
-    confidenceScore: float = attr.ib()
+    intentName: str
+    confidenceScore: float
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class SlotRange:
     """Index range of a slot in text."""
 
-    start: int = attr.ib()
-    end: int = attr.ib()
+    start: int
+    end: int
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class Slot:
     """Named entity in an intent."""
 
-    entity: str = attr.ib()
-    slotName: str = attr.ib()
-    confidence: float = attr.ib()
-    raw_value: str = attr.ib()
-    value: str = attr.ib()
-    range: typing.Optional[SlotRange] = attr.ib(default=None)
+    entity: str
+    slotName: str
+    confidence: float
+    raw_value: str
+    value: str
+    range: typing.Optional[SlotRange] = None

@@ -14,23 +14,23 @@ class DialogueActionType(str, Enum):
     NOTIFICATION = "notification"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueAction:
     """Dialogue session action."""
 
-    canBeEnqueued: bool = attr.ib()
-    type: DialogueActionType = attr.ib(default=DialogueActionType.ACTION)
-    text: str = attr.ib(default="")
-    intentFilter: typing.Optional[typing.List[str]] = attr.ib(default=None)
-    sendIntentNotRecognized: bool = attr.ib(default=False)
+    canBeEnqueued: bool
+    type: DialogueActionType = DialogueActionType.ACTION
+    text: str = ""
+    intentFilter: typing.Optional[typing.List[str]] = None
+    sendIntentNotRecognized: bool = False
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueNotification:
     """Dialogue session notification."""
 
-    text: str = attr.ib()
-    type: DialogueActionType = attr.ib(default=DialogueActionType.NOTIFICATION)
+    text: str
+    type: DialogueActionType = DialogueActionType.NOTIFICATION
 
 
 class DialogueSessionTerminationReason(str, Enum):
@@ -43,106 +43,106 @@ class DialogueSessionTerminationReason(str, Enum):
     ERROR = "error"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueSessionTermination:
     """Dialogue session termination type."""
 
-    reason: DialogueSessionTerminationReason = attr.ib()
+    reason: DialogueSessionTerminationReason
 
 
 # -----------------------------------------------------------------------------
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueStartSession(Message):
     """Start a dialogue session."""
 
-    init: typing.Union[DialogueAction, DialogueNotification] = attr.ib()
-    siteId: str = attr.ib(default="default")
-    customData: str = attr.ib(default="")
+    init: typing.Union[DialogueAction, DialogueNotification]
+    siteId: str = "default"
+    customData: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/startSession"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueSessionQueued(Message):
     """Sent when a dialogue session has been queued."""
 
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
-    customData: str = attr.ib(default="")
+    siteId: str = "default"
+    sessionId: str = ""
+    customData: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/sessionQueued"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueSessionStarted(Message):
     """Sent when a dialogue session has been started."""
 
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
-    customData: str = attr.ib(default="")
+    siteId: str = "default"
+    sessionId: str = ""
+    customData: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/sessionStarted"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueContinueSession(Message):
     """Sent when a dialogue session should be continued."""
 
-    sessionId: str = attr.ib(default="")
-    customData: str = attr.ib(default="")
+    sessionId: str = ""
+    customData: str = ""
 
-    text: str = attr.ib(default="")
-    intentFilter: typing.Optional[typing.List[str]] = attr.ib(default=None)
-    sendIntentNotRecognized: bool = attr.ib(default=False)
-    slot: str = attr.ib(default="")
+    text: str = ""
+    intentFilter: typing.Optional[typing.List[str]] = None
+    sendIntentNotRecognized: bool = False
+    slot: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/continueSession"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueEndSession(Message):
     """Sent when a dialogue session should be ended."""
 
-    sessionId: str = attr.ib(default="")
-    customData: str = attr.ib(default="")
+    sessionId: str = ""
+    customData: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/endSession"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueSessionEnded(Message):
     """Sent when a dialogue session has ended."""
 
-    termination: DialogueSessionTermination = attr.ib()
-    sessionId: str = attr.ib(default="")
-    customData: str = attr.ib(default="")
-    siteId: str = attr.ib(default="")
+    termination: DialogueSessionTermination
+    sessionId: str = ""
+    customData: str = ""
+    siteId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/sessionEnded"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class DialogueIntentNotRecognized(Message):
     """Intent not recognized."""
 
-    input: str = attr.ib(default="")
-    sessionId: str = attr.ib(default="")
-    customData: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
+    input: str = ""
+    sessionId: str = ""
+    customData: str = ""
+    siteId: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:

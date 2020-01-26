@@ -8,36 +8,36 @@ from .base import Message
 from .intent import Intent, Slot
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class NluQuery(Message):
     """Send text to the NLU component."""
 
-    input: str = attr.ib()
-    intentFilter: typing.Optional[typing.List[str]] = attr.ib(default=None)
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    input: str
+    intentFilter: typing.Optional[typing.List[str]] = None
+    id: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/nlu/query"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class NluIntent(Message):
     """Intent recognized."""
 
     TOPIC_PATTERN = re.compile(r"^hermes/intent/([^/]+)$")
 
-    input: str = attr.ib()
-    intent: Intent = attr.ib()
-    slots: typing.List[Slot] = attr.ib(factory=list)
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
-    customData: str = attr.ib(default="")
-    asrTokens: typing.List[str] = attr.ib(factory=list)
-    asrConfidence: float = attr.ib(default=1.0)
+    input: str
+    intent: Intent
+    slots: typing.List[Slot] = attr.Factory(list)
+    id: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
+    customData: str = ""
+    asrTokens: typing.List[str] = attr.Factory(list)
+    asrConfidence: float = 1.0
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -57,28 +57,28 @@ class NluIntent(Message):
         return re.match(NluIntent.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class NluIntentNotRecognized(Message):
     """Intent not recognized."""
 
-    input: str = attr.ib()
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    input: str
+    id: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/nlu/intentNotRecognized"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class NluError(Message):
     """Error from NLU component."""
 
-    error: str = attr.ib()
-    context: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    error: str
+    context: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:

@@ -4,27 +4,27 @@ import attr
 from .base import Message
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class TtsSay(Message):
     """Send text to be spoken by the text to speech component."""
 
-    text: str = attr.ib()
-    lang: str = attr.ib(default="")
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    text: str
+    lang: str = ""
+    id: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/tts/say"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class TtsSayFinished(Message):
     """Sent when text to speech component has finished speaking some text."""
 
-    id: str = attr.ib(default="")
-    sessionId: str = attr.ib(default="")
+    id: str = ""
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:

@@ -6,40 +6,40 @@ import attr
 from .base import Message
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class HotwordToggleOn(Message):
     """Activate the wake word component."""
 
-    siteId: str = attr.ib(default="default")
+    siteId: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/hotword/toggleOn"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class HotwordToggleOff(Message):
     """Deactivate the wake word component."""
 
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/hotword/toggleOff"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class HotwordDetected(Message):
     """Wake word component has detected a specific wake word."""
 
     TOPIC_PATTERN = re.compile(r"^hermes/hotword/([^/]+)/detected$")
 
-    modelId: str = attr.ib()
-    modelVersion: str = attr.ib()
-    modelType: str = attr.ib()
-    currentSensitivity: float = attr.ib()
-    siteId: str = attr.ib(default="default")
+    modelId: str
+    modelVersion: str
+    modelType: str
+    currentSensitivity: float
+    siteId: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
