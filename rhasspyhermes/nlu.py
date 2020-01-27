@@ -83,3 +83,63 @@ class NluError(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/error/nlu"
+
+
+# ----------------------------------------------------------------------------
+# Rhasspy-specific Messages
+# ----------------------------------------------------------------------------
+
+
+@attr.s
+class NluTrain(Message):
+    """Request to retrain from sentences"""
+
+    TOPIC_PATTERN = re.compile(r"^rhasspy/nlu/([^/]+)/train$")
+
+    id: str = attr.ib()
+    sentences: typing.Dict[str, str] = attr.ib()
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        siteId = kwargs.get("siteId", "default")
+        return f"rhasspy/nlu/{siteId}/train"
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(NluTrain.TOPIC_PATTERN, topic) is not None
+
+    @classmethod
+    def get_siteId(cls, topic: str) -> str:
+        """Get siteId from a topic"""
+        match = re.match(NluTrain.TOPIC_PATTERN, topic)
+        assert match, "Not a train topic"
+        return match.group(1)
+
+
+@attr.s
+class NluTrainSuccess(Message):
+    """Result from successful training"""
+
+    TOPIC_PATTERN = re.compile(r"^rhasspy/nlu/([^/]+)/trainSuccess$")
+
+    id: str = attr.ib()
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        siteId = kwargs.get("siteId", "default")
+        return f"rhasspy/nlu/{siteId}/trainSuccess"
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(NluTrainSuccess.TOPIC_PATTERN, topic) is not None
+
+    @classmethod
+    def get_siteId(cls, topic: str) -> str:
+        """Get siteId from a topic"""
+        match = re.match(NluTrainSuccess.TOPIC_PATTERN, topic)
+        assert match, "Not a trainSuccess topic"
+        return match.group(1)
