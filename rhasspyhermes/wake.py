@@ -57,3 +57,17 @@ class HotwordDetected(Message):
     def is_topic(cls, topic: str) -> bool:
         """True if topic matches template"""
         return re.match(HotwordDetected.TOPIC_PATTERN, topic) is not None
+
+
+@attr.s(auto_attribs=True)
+class HotwordError(Message):
+    """Error from Hotword component."""
+
+    error: str
+    context: str = ""
+    siteId: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get Hermes topic"""
+        return "hermes/error/hotword"
