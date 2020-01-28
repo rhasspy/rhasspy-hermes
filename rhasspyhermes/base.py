@@ -7,6 +7,9 @@ import typing
 class Message(ABC):
     """Base class for Hermes messages."""
 
+    def __init__(self, **kwargs):
+        pass
+
     @classmethod
     @abstractmethod
     def topic(cls, **kwargs) -> str:

@@ -64,13 +64,14 @@ class G2pPhonemes(Message):
     @classmethod
     def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
         """Construct message from dictionary."""
-        message = super().from_dict(message_dict)
+        word_phonemes = message_dict.pop("wordPhonemes", {})
+        message = G2pPhonemes(**message_dict)
         message.wordPhonemes = {
             word: [
                 G2pPronunciation(**word_pron)
-                for word_pron in message.wordPhonemes[word]
+                for word_pron in word_phonemes[word]
             ]
-            for word in message.wordPhonemes
+            for word in word_phonemes
         }
 
         return message
