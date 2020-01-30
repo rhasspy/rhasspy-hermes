@@ -5,7 +5,7 @@ import attr
 from rhasspyhermes.base import Message
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class G2pPronounce(Message):
     """Get phonetic pronunciation for words."""
 
@@ -28,7 +28,7 @@ class G2pPronounce(Message):
         return "rhasspy/g2p/pronounce"
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class G2pPronunciation:
     """Phonetic pronunciation for a single word (in G2pPhonemes)."""
 
@@ -40,7 +40,7 @@ class G2pPronunciation:
     guessed: bool = False
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class G2pPhonemes(Message):
     """Response to G2pPronunciation."""
 
@@ -74,7 +74,7 @@ class G2pPhonemes(Message):
         return message
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class G2pError(Message):
     """Error from G2P component."""
 

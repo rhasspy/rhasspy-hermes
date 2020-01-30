@@ -8,7 +8,7 @@ from .base import Message
 from .intent import Intent, Slot
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class NluQuery(Message):
     """Send text to the NLU component."""
 
@@ -23,7 +23,7 @@ class NluQuery(Message):
         return "hermes/nlu/query"
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class NluIntent(Message):
     """Intent recognized."""
 
@@ -57,7 +57,7 @@ class NluIntent(Message):
         return re.match(NluIntent.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class NluIntentNotRecognized(Message):
     """Intent not recognized."""
 
@@ -71,7 +71,7 @@ class NluIntentNotRecognized(Message):
         return "hermes/nlu/intentNotRecognized"
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class NluError(Message):
     """Error from NLU component."""
 

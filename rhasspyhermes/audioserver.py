@@ -11,7 +11,7 @@ import attr
 from .base import Message
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioFrame(Message):
     """Captured sound frame."""
 
@@ -63,7 +63,7 @@ class AudioFrame(Message):
                 frames_left -= frames_per_chunk
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioPlayBytes(Message):
     """Play WAV sound on specific site."""
 
@@ -97,7 +97,7 @@ class AudioPlayBytes(Message):
         return re.match(AudioPlayBytes.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioPlayFinished(Message):
     """Sent when audio service has finished playing a sound."""
 
@@ -134,7 +134,7 @@ class AudioDeviceMode(str, Enum):
     OUTPUT = "output"
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioDevice:
     """Description of an audio device."""
 
@@ -145,7 +145,7 @@ class AudioDevice:
     working: bool = True
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioGetDevices(Message):
     """Get details for audio input devices."""
 
@@ -159,7 +159,7 @@ class AudioGetDevices(Message):
         return "rhasspy/audioServer/getDevices"
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioDevices(Message):
     """Response to getDevices."""
 
