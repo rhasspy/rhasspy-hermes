@@ -5,22 +5,22 @@ import attr
 from rhasspyhermes.base import Message
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class G2pPronounce(Message):
     """Get phonetic pronunciation for words."""
 
     # User id that will be returned in response
-    id: str = attr.ib(default="")
+    id: str = ""
 
     # Words to guess pronunciations for
-    words: typing.List[str] = attr.ib(factory=list)
+    words: typing.List[str] = attr.Factory(list)
 
     # Hermes siteId/sessionId
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    siteId: str = "default"
+    sessionId: str = ""
 
     # Maximum number of guesses to return
-    numGuesses: int = attr.ib(default=5)
+    numGuesses: int = 5
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -28,33 +28,31 @@ class G2pPronounce(Message):
         return "rhasspy/g2p/pronounce"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class G2pPronunciation:
     """Phonetic pronunciation for a single word (in G2pPhonemes)."""
 
     # Phonetic pronunciation for word
-    phonemes: typing.List[str] = attr.ib(factory=list)
+    phonemes: typing.List[str] = attr.Factory(list)
 
     # True if this pronunciation was guessed using a g2p model.
     # False if it came from a pronunciation dictionary.
-    guessed: bool = attr.ib(default=False)
+    guessed: bool = False
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class G2pPhonemes(Message):
     """Response to G2pPronunciation."""
 
     # Guessed or looked up pronunciations
-    wordPhonemes: typing.Dict[str, typing.List[G2pPronunciation]] = attr.ib(
-        factory=dict
-    )
+    wordPhonemes: typing.Dict[str, typing.List[G2pPronunciation]] = attr.Factory(dict)
 
     # User id from request
-    id: str = attr.ib(default="")
+    id: str = ""
 
     # Hermes siteId/sessionId
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -76,15 +74,15 @@ class G2pPhonemes(Message):
         return message
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class G2pError(Message):
     """Error from G2P component."""
 
-    error: str = attr.ib()
-    context: str = attr.ib(default="")
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    error: str
+    context: str = ""
+    id: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:

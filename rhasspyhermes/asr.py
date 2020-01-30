@@ -74,14 +74,14 @@ class AsrTextCaptured(Message):
 # ----------------------------------------------------------------------------
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AsrError(Message):
     """Error from ASR component."""
 
-    error: str = attr.ib()
-    context: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    sessionId: str = attr.ib(default="")
+    error: str
+    context: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -89,14 +89,14 @@ class AsrError(Message):
         return "hermes/error/asr"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AsrTrain(Message):
     """Request to retrain from intent graph"""
 
     TOPIC_PATTERN = re.compile(r"^rhasspy/asr/([^/]+)/train$")
 
-    id: str = attr.ib()
-    graph_dict: typing.Dict[str, typing.Any] = attr.ib()
+    id: str
+    graph_dict: typing.Dict[str, typing.Any]
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -117,13 +117,13 @@ class AsrTrain(Message):
         return match.group(1)
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AsrTrainSuccess(Message):
     """Result from successful training"""
 
     TOPIC_PATTERN = re.compile(r"^rhasspy/asr/([^/]+)/trainSuccess$")
 
-    id: str = attr.ib()
+    id: str
 
     @classmethod
     def topic(cls, **kwargs) -> str:

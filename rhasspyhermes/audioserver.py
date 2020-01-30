@@ -134,37 +134,38 @@ class AudioDeviceMode(str, Enum):
     OUTPUT = "output"
 
 
+@attr.s(auto_attribs=True)
 class AudioDevice:
     """Description of an audio device."""
 
-    mode: AudioDeviceMode = attr.ib()
-    id: str = attr.ib()
-    name: str = attr.ib()
-    description: str = attr.ib()
-    working: bool = attr.ib(default=True)
+    mode: AudioDeviceMode
+    id: str
+    name: str
+    description: str
+    working: bool = True
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AudioGetDevices(Message):
     """Get details for audio input devices."""
 
-    modes: typing.List[AudioDeviceMode] = attr.ib()
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    test: bool = attr.ib(default=False)
+    modes: typing.List[AudioDeviceMode]
+    id: str = ""
+    siteId: str = "default"
+    test: bool = False
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "rhasspy/audioServer/getDevices"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AudioDevices(Message):
     """Response to getDevices."""
 
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    devices: typing.List[AudioDevice] = attr.ib(factory=list)
+    id: str = ""
+    siteId: str = "default"
+    devices: typing.List[AudioDevice] = attr.Factory(list)
 
     @classmethod
     def topic(cls, **kwargs) -> str:
