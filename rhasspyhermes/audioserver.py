@@ -20,8 +20,7 @@ class AudioFrame(Message):
     wav_data: bytes
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
-        siteId = kwargs.get("siteId", "default")
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
         return f"hermes/audioServer/{siteId}/audioFrame"
 
     @classmethod
@@ -72,8 +71,8 @@ class AudioPlayBytes(Message):
     wav_data: bytes
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
-        siteId = kwargs.get("siteId", "default")
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
+        #TODO refactor this
         requestId = kwargs.get("requestId") or str(uuid4())
         return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
 
@@ -107,8 +106,7 @@ class AudioPlayFinished(Message):
     sessionId: str = ""
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
-        siteId = kwargs.get("siteId", "default")
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
         return f"hermes/audioServer/{siteId}/playFinished"
 
     @classmethod

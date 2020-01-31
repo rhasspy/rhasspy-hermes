@@ -40,8 +40,7 @@ class NluIntent(Message):
     asrConfidence: float = 1.0
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
-        intentName = kwargs["intentName"]
+    def topic(cls, intentName: str, **kwargs) -> str:
         return f"hermes/intent/{intentName}"
 
     @classmethod

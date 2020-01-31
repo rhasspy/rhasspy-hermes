@@ -99,9 +99,8 @@ class AsrTrain(Message):
     graph_dict: typing.Dict[str, typing.Any]
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
         """Get MQTT topic for this message type."""
-        siteId = kwargs.get("siteId", "default")
         return f"rhasspy/asr/{siteId}/train"
 
     @classmethod
@@ -126,9 +125,8 @@ class AsrTrainSuccess(Message):
     id: str
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
         """Get MQTT topic for this message type."""
-        siteId = kwargs.get("siteId", "default")
         return f"rhasspy/asr/{siteId}/trainSuccess"
 
     @classmethod
