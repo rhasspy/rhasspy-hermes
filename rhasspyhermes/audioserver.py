@@ -134,6 +134,7 @@ class AudioDeviceMode(str, Enum):
     OUTPUT = "output"
 
 
+@attr.s(auto_attribs=True)
 class AudioDevice:
     """Description of an audio device."""
 
@@ -144,7 +145,7 @@ class AudioDevice:
     working: bool = attr.ib(default=True)
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AudioGetDevices(Message):
     """Get details for audio input devices."""
 
@@ -158,7 +159,7 @@ class AudioGetDevices(Message):
         return "rhasspy/audioServer/getDevices"
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class AudioDevices(Message):
     """Response to getDevices."""
 
@@ -169,3 +170,9 @@ class AudioDevices(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "rhasspy/audioServer/devices"
+
+    @classmethod
+    def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
+        """Construct message from dictionary."""
+        devices = message_dict.pop("devices", [])
+        return AudioDevices(**message_dict, devices=[AudioDevice(**d) for d in devices])
