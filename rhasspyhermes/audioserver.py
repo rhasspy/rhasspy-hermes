@@ -142,7 +142,7 @@ class AudioDevice:
     id: str = attr.ib()
     name: str = attr.ib()
     description: str = attr.ib()
-    working: bool = attr.ib(default=True)
+    working: typing.Optional[bool] = attr.ib(default=None)
 
 
 @attr.s(auto_attribs=True)
