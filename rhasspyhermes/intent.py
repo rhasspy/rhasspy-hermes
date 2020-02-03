@@ -4,7 +4,7 @@ import typing
 import attr
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class Intent:
     """Intent name and confidence."""
 
@@ -12,7 +12,7 @@ class Intent:
     confidenceScore: float
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class SlotRange:
     """Index range of a slot in text."""
 
@@ -20,7 +20,7 @@ class SlotRange:
     end: int
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class Slot:
     """Named entity in an intent."""
 

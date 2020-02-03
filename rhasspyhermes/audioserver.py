@@ -11,7 +11,7 @@ import attr
 from .base import Message
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioFrame(Message):
     """Captured sound frame."""
 
@@ -20,8 +20,7 @@ class AudioFrame(Message):
     wav_data: bytes
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
-        siteId = kwargs.get("siteId", "default")
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
         return f"hermes/audioServer/{siteId}/audioFrame"
 
     @classmethod
@@ -63,7 +62,7 @@ class AudioFrame(Message):
                 frames_left -= frames_per_chunk
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioPlayBytes(Message):
     """Play WAV sound on specific site."""
 
@@ -72,8 +71,8 @@ class AudioPlayBytes(Message):
     wav_data: bytes
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
-        siteId = kwargs.get("siteId", "default")
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
+        # TODO refactor this
         requestId = kwargs.get("requestId") or str(uuid4())
         return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
 
@@ -97,7 +96,7 @@ class AudioPlayBytes(Message):
         return re.match(AudioPlayBytes.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioPlayFinished(Message):
     """Sent when audio service has finished playing a sound."""
 
@@ -107,8 +106,7 @@ class AudioPlayFinished(Message):
     sessionId: str = ""
 
     @classmethod
-    def topic(cls, **kwargs) -> str:
-        siteId = kwargs.get("siteId", "default")
+    def topic(cls, siteId: str = "default", **kwargs) -> str:
         return f"hermes/audioServer/{siteId}/playFinished"
 
     @classmethod
@@ -134,38 +132,39 @@ class AudioDeviceMode(str, Enum):
     OUTPUT = "output"
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioDevice:
     """Description of an audio device."""
 
-    mode: AudioDeviceMode = attr.ib()
-    id: str = attr.ib()
-    name: str = attr.ib()
-    description: str = attr.ib()
+    mode: AudioDeviceMode
+    id: str
+    name: str
+    description: str
+    working: bool = True
     working: typing.Optional[bool] = attr.ib(default=None)
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioGetDevices(Message):
     """Get details for audio input devices."""
 
-    modes: typing.List[AudioDeviceMode] = attr.ib()
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    test: bool = attr.ib(default=False)
+    modes: typing.List[AudioDeviceMode]
+    id: str = ""
+    siteId: str = "default"
+    test: bool = False
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "rhasspy/audioServer/getDevices"
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class AudioDevices(Message):
     """Response to getDevices."""
 
-    id: str = attr.ib(default="")
-    siteId: str = attr.ib(default="default")
-    devices: typing.List[AudioDevice] = attr.ib(factory=list)
+    id: str = ""
+    siteId: str = "default"
+    devices: typing.List[AudioDevice] = attr.Factory(list)
 
     @classmethod
     def topic(cls, **kwargs) -> str:
