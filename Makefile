@@ -12,6 +12,10 @@ architecture := $(shell dpkg-architecture | grep DEB_BUILD_ARCH= | sed 's/[^=]\+
 debian_package := rhasspy-hermes_$(version)_$(architecture)
 debian_dir := debian/$(debian_package)
 
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+
 reformat:
 	black .
 	isort $(PYTHON_FILES)
@@ -26,15 +30,39 @@ check:
 	yamllint .
 	pip list --outdated
 
+venv:
+	scripts/create-venv.sh
+
+
 dist: sdist debian
 
 sdist:
 	python3 setup.py sdist
 
+test:
+	coverage run --source=$(SOURCE) -m pytest
+	coverage report -m
+	coverage xml
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+
+docker: pyinstaller
+	docker build . -t "rhasspy/$(PACKAGE_NAME):$(version)" -t "rhasspy/$(PACKAGE_NAME):latest"
+
+deploy:
+	echo "$$DOCKER_PASSWORD" | docker login -u "$$DOCKER_USERNAME" --password-stdin
+	docker push "rhasspy/$(PACKAGE_NAME):$(version)"
+
+# -----------------------------------------------------------------------------
+# Debian
+# -----------------------------------------------------------------------------
+
 pyinstaller:
 	mkdir -p dist
-	pyinstaller -y --workpath pyinstaller/build --distpath pyinstaller/dist rhasspyhermes.spec
-	tar -C pyinstaller/dist -czf dist/rhasspy-hermes_$(version)_$(architecture).tar.gz rhasspyhermes/
+	pyinstaller -y --workpath pyinstaller/build --distpath pyinstaller/dist $(PYTHON_NAME).spec
+	tar -C pyinstaller/dist -czf dist/$(PACKAGE_NAME)_$(version)_$(architecture).tar.gz $(PYTHON_NAME)/
 
 debian: pyinstaller
 	mkdir -p dist
@@ -45,23 +73,3 @@ debian: pyinstaller
 	cp -R pyinstaller/dist/rhasspyhermes "$(debian_dir)/usr/lib/"
 	cd debian/ && fakeroot dpkg --build "$(debian_package)"
 	mv "debian/$(debian_package).deb" dist/
-
-docker: pyinstaller
-	docker build . -t "rhasspy/rhasspy-hermes:$(version)"
-
-deploy:
-	echo "$$DOCKER_PASSWORD" | docker login -u "$$DOCKER_USERNAME" --password-stdin
-	docker push rhasspy/rhasspy-hermes:$(version)
-
-test:
-	coverage run --source=$(SOURCE) -m pytest
-	coverage report -m
-	coverage xml
-
-venv:
-	rm -rf .venv/
-	python3 -m venv .venv
-	.venv/bin/pip3 $(PIP_INSTALL) --upgrade pip
-	.venv/bin/pip3 $(PIP_INSTALL) wheel setuptools
-	.venv/bin/pip3 $(PIP_INSTALL) -r requirements.txt
-	.venv/bin/pip3 $(PIP_INSTALL) -r requirements_dev.txt

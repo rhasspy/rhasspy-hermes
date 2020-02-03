@@ -140,7 +140,6 @@ class AudioDevice:
     id: str
     name: str
     description: str
-    working: bool = True
     working: typing.Optional[bool] = attr.ib(default=None)
 
 
@@ -173,5 +172,6 @@ class AudioDevices(Message):
     @classmethod
     def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
         """Construct message from dictionary."""
-        devices = message_dict.pop("devices", [])
-        return AudioDevices(**message_dict, devices=[AudioDevice(**d) for d in devices])
+        device_dicts = message_dict.pop("devices", [])
+        devices = [AudioDevice(**d) for d in device_dicts]
+        return AudioDevices(**message_dict, devices=devices)
