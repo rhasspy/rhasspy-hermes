@@ -55,6 +55,16 @@ class NluIntent(Message):
         """True if topic matches template"""
         return re.match(NluIntent.TOPIC_PATTERN, topic) is not None
 
+    @classmethod
+    def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
+        """Construct message from dictionary."""
+        intent_dict = message_dict.pop("intent", {})
+        slot_dicts = message_dict.pop("slots", [])
+        message = NluIntent(**message_dict, intent=Intent(**intent_dict))
+        message.slots = [Slot.from_dict(s) for s in slot_dicts]
+
+        return message
+
 
 @attr.s(auto_attribs=True, slots=True)
 class NluIntentNotRecognized(Message):

@@ -30,3 +30,12 @@ class Slot:
     raw_value: str
     value: str
     range: typing.Optional[SlotRange] = None
+
+    @classmethod
+    def from_dict(cls, object_dict: typing.Dict[str, typing.Any]):
+        slot_range = object_dict.pop("range")
+        slot = Slot(**object_dict)
+        if slot_range:
+            slot.range = SlotRange(**slot_range)
+
+        return slot
