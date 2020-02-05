@@ -41,6 +41,9 @@ class HotwordDetected(Message):
     currentSensitivity: float
     siteId: str = "default"
 
+    # Rhasspy specific
+    sessionId: str = ""
+
     @classmethod
     def topic(cls, wakewordId: str, **kwargs) -> str:
         return f"hermes/hotword/{wakewordId}/detected"

@@ -36,6 +36,9 @@ class AsrStartListening(Message):
     siteId: str = "default"
     sessionId: str = ""
 
+    # Rhasspy-specific
+    stopOnSilence: bool = True
+
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/asr/startListening"
@@ -47,6 +50,9 @@ class AsrStopListening(Message):
 
     siteId: str = "default"
     sessionId: str = ""
+
+    # Rhasspy-specific
+    sendAudioCaptured: bool = False
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -142,3 +148,37 @@ class AsrTrainSuccess(Message):
         match = re.match(AsrTrainSuccess.TOPIC_PATTERN, topic)
         assert match, "Not a trainSuccess topic"
         return match.group(1)
+
+
+@attr.s(auto_attribs=True, slots=True)
+class AsrAudioCaptured(Message):
+    """Audio captured from ASR session."""
+
+    TOPIC_PATTERN = re.compile(r"^rhasspy/asr/([^/]+)/([^/]+)/audioCaptured$")
+
+    wav_bytes: bytes
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        siteId = kwargs.get("siteId", "default")
+        sessionId = kwargs.get("siteId", "")
+        return f"hermes/asr/{siteId}/{sessionId}/audioCaptured"
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(AsrAudioCaptured.TOPIC_PATTERN, topic) is not None
+
+    @classmethod
+    def get_siteId(cls, topic: str) -> str:
+        """Get siteId from a topic"""
+        match = re.match(AsrAudioCaptured.TOPIC_PATTERN, topic)
+        assert match, "Not an audioCaptured topic"
+        return match.group(1)
+
+    @classmethod
+    def get_sessionId(cls, topic: str) -> str:
+        """Get sessionId from a topic"""
+        match = re.match(AsrAudioCaptured.TOPIC_PATTERN, topic)
+        assert match, "Not an audioCaptured topic"
+        return match.group(2)
