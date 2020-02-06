@@ -33,6 +33,7 @@ class Slot:
 
     @classmethod
     def from_dict(cls, object_dict: typing.Dict[str, typing.Any]):
+        """Parse into Slot object from dictionary."""
         slot_range = object_dict.pop("range")
         slot = Slot(**object_dict)
         if slot_range:

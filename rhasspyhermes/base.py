@@ -1,7 +1,6 @@
 """Support for Snips Hermes protocol."""
-from abc import ABC, abstractmethod
-
 import typing
+from abc import ABC, abstractmethod
 
 
 class Message(ABC):

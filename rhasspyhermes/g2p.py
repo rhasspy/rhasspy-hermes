@@ -2,6 +2,7 @@
 import typing
 
 import attr
+
 from rhasspyhermes.base import Message
 
 
@@ -65,10 +66,7 @@ class G2pPhonemes(Message):
         word_phonemes = message_dict.pop("wordPhonemes", {})
         message = G2pPhonemes(**message_dict)
         message.wordPhonemes = {
-            word: [
-                G2pPronunciation(**word_pron)
-                for word_pron in word_phonemes[word]
-            ]
+            word: [G2pPronunciation(**word_pron) for word_pron in word_phonemes[word]]
             for word in word_phonemes
         }
 

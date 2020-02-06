@@ -20,7 +20,9 @@ class AudioFrame(Message):
     wav_data: bytes
 
     @classmethod
-    def topic(cls, siteId: str = "default", **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
+        siteId = kwargs.get("siteId", "default")
         return f"hermes/audioServer/{siteId}/audioFrame"
 
     @classmethod
@@ -71,8 +73,9 @@ class AudioPlayBytes(Message):
     wav_data: bytes
 
     @classmethod
-    def topic(cls, siteId: str = "default", **kwargs) -> str:
-        # TODO refactor this
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
+        siteId = kwargs.get("siteId", "default")
         requestId = kwargs.get("requestId") or str(uuid4())
         return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
 
@@ -106,7 +109,9 @@ class AudioPlayFinished(Message):
     sessionId: str = ""
 
     @classmethod
-    def topic(cls, siteId: str = "default", **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
+        siteId = kwargs.get("siteId", "default")
         return f"hermes/audioServer/{siteId}/playFinished"
 
     @classmethod
@@ -154,6 +159,7 @@ class AudioGetDevices(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
         return "rhasspy/audioServer/getDevices"
 
 
@@ -167,6 +173,7 @@ class AudioDevices(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
         return "rhasspy/audioServer/devices"
 
     @classmethod
@@ -174,4 +181,5 @@ class AudioDevices(Message):
         """Construct message from dictionary."""
         device_dicts = message_dict.pop("devices", [])
         devices = [AudioDevice(**d) for d in device_dicts]
-        return AudioDevices(**message_dict, devices=devices)
+
+        return AudioDevices(**message_dict, devices=devices)  # type: ignore

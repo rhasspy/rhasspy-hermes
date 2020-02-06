@@ -40,7 +40,9 @@ class NluIntent(Message):
     asrConfidence: float = 1.0
 
     @classmethod
-    def topic(cls, intentName: str, **kwargs) -> str:
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message (intentName)."""
+        intentName = kwargs["intentName"]
         return f"hermes/intent/{intentName}"
 
     @classmethod
@@ -60,7 +62,9 @@ class NluIntent(Message):
         """Construct message from dictionary."""
         intent_dict = message_dict.pop("intent", {})
         slot_dicts = message_dict.pop("slots", [])
-        message = NluIntent(**message_dict, intent=Intent(**intent_dict))
+        message = NluIntent(  # type: ignore
+            **message_dict, intent=Intent(**intent_dict)
+        )
         message.slots = [Slot.from_dict(s) for s in slot_dicts]
 
         return message
