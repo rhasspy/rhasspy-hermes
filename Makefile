@@ -1,7 +1,7 @@
 SHELL := bash
 PYTHON_NAME = rhasspyhermes
 PACKAGE_NAME = rhasspy-hermes
-PYTHON_FILES = $(SOURCE)/*.py tests/*.py setup.py
+PYTHON_FILES = $(PYTHON_NAME)/*.py tests/*.py setup.py
 SHELL_FILES = bin/* debian/bin/*
 PIP_INSTALL ?= install
 
