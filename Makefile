@@ -32,9 +32,7 @@ sdist:
 	python3 setup.py sdist
 
 test:
-	coverage run --source=$(SOURCE) -m pytest
-	coverage report -m
-	coverage xml
+	scripts/run-tests.sh $(SOURCE)
 
 # -----------------------------------------------------------------------------
 # Docker
