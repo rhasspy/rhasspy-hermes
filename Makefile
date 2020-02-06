@@ -10,9 +10,6 @@ PIP_INSTALL ?= install
 version := $(shell cat VERSION)
 architecture := $(shell dpkg-architecture | grep DEB_BUILD_ARCH= | sed 's/[^=]\+=//')
 
-debian_package := rhasspy-hermes_$(version)_$(architecture)
-debian_dir := debian/$(debian_package)
-
 # -----------------------------------------------------------------------------
 # Python
 # -----------------------------------------------------------------------------
@@ -51,16 +48,7 @@ deploy:
 # -----------------------------------------------------------------------------
 
 pyinstaller:
-	mkdir -p dist
-	pyinstaller -y --workpath pyinstaller/build --distpath pyinstaller/dist $(PYTHON_NAME).spec
-	tar -C pyinstaller/dist -czf dist/$(PACKAGE_NAME)_$(version)_$(architecture).tar.gz $(PYTHON_NAME)/
+	scripts/build-pyinstaller.sh "${architecture}" "${version}"
 
-debian: pyinstaller
-	mkdir -p dist
-	rm -rf "$(debian_dir)"
-	mkdir -p "$(debian_dir)/DEBIAN" "$(debian_dir)/usr/bin" "$(debian_dir)/usr/lib"
-	cat debian/DEBIAN/control | version=$(version) architecture=$(architecture) envsubst > "$(debian_dir)/DEBIAN/control"
-	cp debian/bin/* "$(debian_dir)/usr/bin/"
-	cp -R pyinstaller/dist/rhasspyhermes "$(debian_dir)/usr/lib/"
-	cd debian/ && fakeroot dpkg --build "$(debian_package)"
-	mv "debian/$(debian_package).deb" dist/
+debian:
+	scripts/build-debian.sh "${architecture}" "${version}"
