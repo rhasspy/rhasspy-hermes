@@ -1,5 +1,6 @@
 SHELL := bash
-SOURCE = rhasspyhermes
+PYTHON_NAME = rhasspyhermes
+PACKAGE_NAME = rhasspy-hermes
 PYTHON_FILES = $(SOURCE)/*.py tests/*.py setup.py
 SHELL_FILES = bin/* debian/bin/*
 PIP_INSTALL ?= install
@@ -26,13 +27,13 @@ venv:
 	scripts/create-venv.sh
 
 
-dist: sdist debian
+dist: sdist
 
 sdist:
 	python3 setup.py sdist
 
 test:
-	scripts/run-tests.sh $(SOURCE)
+	scripts/run-tests.sh $(PYTHON_NAME)
 
 # -----------------------------------------------------------------------------
 # Docker
