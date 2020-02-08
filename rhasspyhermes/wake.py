@@ -11,6 +11,7 @@ class HotwordToggleOn(Message):
     """Activate the wake word component."""
 
     siteId: str = "default"
+    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:

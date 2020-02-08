@@ -38,6 +38,7 @@ class AsrStartListening(Message):
 
     # Rhasspy-specific
     stopOnSilence: bool = True
+    sendAudioCaptured: bool = False
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -50,9 +51,6 @@ class AsrStopListening(Message):
 
     siteId: str = "default"
     sessionId: str = ""
-
-    # Rhasspy-specific
-    sendAudioCaptured: bool = False
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -162,7 +160,7 @@ class AsrAudioCaptured(Message):
     def topic(cls, **kwargs) -> str:
         siteId = kwargs.get("siteId", "default")
         sessionId = kwargs.get("siteId", "")
-        return f"hermes/asr/{siteId}/{sessionId}/audioCaptured"
+        return f"rhasspy/asr/{siteId}/{sessionId}/audioCaptured"
 
     @classmethod
     def is_topic(cls, topic: str) -> bool:
