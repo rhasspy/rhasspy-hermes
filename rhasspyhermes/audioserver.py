@@ -17,7 +17,7 @@ class AudioFrame(Message):
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/audioFrame$")
 
-    wav_data: bytes
+    wav_bytes: bytes
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -57,7 +57,7 @@ class AudioFrame(Message):
                         out_wav.setframerate(in_wav.getframerate())
                         out_wav.setsampwidth(in_wav.getsampwidth())
                         out_wav.setnchannels(in_wav.getnchannels())
-                        out_wav.writeframesraw(chunk)
+                        out_wav.writeframes(chunk)
 
                     yield out_io.getvalue()
 
@@ -70,7 +70,7 @@ class AudioPlayBytes(Message):
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/playBytes/([^/]+)$")
 
-    wav_data: bytes
+    wav_bytes: bytes
 
     @classmethod
     def topic(cls, **kwargs) -> str:
