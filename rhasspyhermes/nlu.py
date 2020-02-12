@@ -69,6 +69,30 @@ class NluIntent(Message):
 
         return message
 
+    @property
+    def raw_input(self):
+        """Get raw input from ASR."""
+        if self.asr_tokens:
+            return " ".join(self.asr_tokens)
+
+        return self.input
+
+    def to_rhasspy_dict(self) -> typing.Dict[str, typing.Any]:
+        """Convert to Rhasspy format."""
+        return {
+            "intent": {
+                "name": self.intent.intentName,
+                "confidence": self.intent.confidenceScore,
+            },
+            "entities": [
+                {"entity": s.slotName, "value": s.value, "raw_value": s.raw_value}
+                for s in self.slots
+            ],
+            "slots": {s.slotName: s.value for s in self.slots},
+            "text": self.input,
+            "raw_text": self.raw_input,
+        }
+
 
 @attr.s(auto_attribs=True, slots=True)
 class NluIntentNotRecognized(Message):
@@ -82,6 +106,10 @@ class NluIntentNotRecognized(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/nlu/intentNotRecognized"
+
+    def to_rhasspy_dict(self) -> typing.Dict[str, typing.Any]:
+        """Return an empty Rhasspy intent dictionary."""
+        return {"text": "", "intent": {"name": "", "confidence": 0}, "entities": []}
 
 
 @attr.s(auto_attribs=True, slots=True)
