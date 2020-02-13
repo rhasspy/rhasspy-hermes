@@ -72,8 +72,8 @@ class NluIntent(Message):
     @property
     def raw_input(self):
         """Get raw input from ASR."""
-        if self.asr_tokens:
-            return " ".join(self.asr_tokens)
+        if self.asrTokens:
+            return " ".join(self.asrTokens)
 
         return self.input
 
