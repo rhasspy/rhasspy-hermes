@@ -11,7 +11,6 @@ class HotwordToggleOn(Message):
     """Activate the wake word component."""
 
     siteId: str = "default"
-    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -23,7 +22,6 @@ class HotwordToggleOff(Message):
     """Deactivate the wake word component."""
 
     siteId: str = "default"
-    sessionId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -37,9 +35,9 @@ class HotwordDetected(Message):
     TOPIC_PATTERN = re.compile(r"^hermes/hotword/([^/]+)/detected$")
 
     modelId: str
-    modelVersion: str
-    modelType: str
-    currentSensitivity: float
+    modelVersion: str = ""
+    modelType: str = "personal"
+    currentSensitivity: float = 1.0
     siteId: str = "default"
 
     # Rhasspy specific
