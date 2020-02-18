@@ -107,6 +107,7 @@ class NluIntentNotRecognized(Message):
     def topic(cls, **kwargs) -> str:
         return "hermes/nlu/intentNotRecognized"
 
+    # pylint: disable=R0201
     def to_rhasspy_dict(self) -> typing.Dict[str, typing.Any]:
         """Return an empty Rhasspy intent dictionary."""
         return {"text": "", "intent": {"name": "", "confidence": 0}, "entities": []}

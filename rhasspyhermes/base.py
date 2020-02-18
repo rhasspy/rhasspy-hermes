@@ -20,6 +20,6 @@ class Message(ABC):
         return cls(**message_dict)
 
     @classmethod
-    def is_topic(cls, topic:str) -> bool:
+    def is_topic(cls, topic: str) -> bool:
         """True if topic is for this message type."""
         return topic == cls.topic()
