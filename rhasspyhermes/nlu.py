@@ -110,7 +110,12 @@ class NluIntentNotRecognized(Message):
     # pylint: disable=R0201
     def to_rhasspy_dict(self) -> typing.Dict[str, typing.Any]:
         """Return an empty Rhasspy intent dictionary."""
-        return {"text": "", "intent": {"name": "", "confidence": 0}, "entities": []}
+        return {
+            "text": self.input,
+            "raw_text": self.input,
+            "intent": {"name": "", "confidence": 0},
+            "entities": [],
+        }
 
 
 @attr.s(auto_attribs=True, slots=True)
