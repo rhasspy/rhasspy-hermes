@@ -183,3 +183,45 @@ class AudioDevices(Message):
         devices = [AudioDevice(**d) for d in device_dicts]
 
         return AudioDevices(**message_dict, devices=devices)  # type: ignore
+
+
+# -----------------------------------------------------------------------------
+# Rhasspy Only
+# -----------------------------------------------------------------------------
+
+
+@attr.s(auto_attribs=True, slots=True)
+class AudioSessionFrame(Message):
+    """Captured sound frame for a session."""
+
+    TOPIC_PATTERN = re.compile(
+        r"^hermes/audioServer/([^/]+)/([^/]+)/audioSessionFrame$"
+    )
+
+    wav_bytes: bytes
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
+        siteId = kwargs.get("siteId", "default")
+        sessionId = kwargs.get("sessionId", "")
+        return f"hermes/audioServer/{siteId}/{sessionId}/audioSessionFrame"
+
+    @classmethod
+    def get_siteId(cls, topic: str) -> str:
+        """Get siteId from a topic"""
+        match = re.match(AudioSessionFrame.TOPIC_PATTERN, topic)
+        assert match, "Not an audioSessionFrame topic"
+        return match.group(1)
+
+    @classmethod
+    def get_sessionId(cls, topic: str) -> str:
+        """Get sessionId from a topic"""
+        match = re.match(AudioSessionFrame.TOPIC_PATTERN, topic)
+        assert match, "Not an audioSessionFrame topic"
+        return match.group(2)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(AudioSessionFrame.TOPIC_PATTERN, topic) is not None

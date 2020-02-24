@@ -115,6 +115,7 @@ class NluIntentNotRecognized(Message):
             "raw_text": self.input,
             "intent": {"name": "", "confidence": 0},
             "entities": [],
+            "slots": {}
         }
 
 
