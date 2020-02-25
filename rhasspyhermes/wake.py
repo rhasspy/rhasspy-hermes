@@ -1,5 +1,6 @@
 """Messages for hermes/hotword"""
 import re
+import typing
 
 import attr
 
@@ -63,7 +64,12 @@ class HotwordDetected(Message):
         return re.match(HotwordDetected.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s(auto_attribs=True)
+# -----------------------------------------------------------------------------
+# Rhasspy Only
+# -----------------------------------------------------------------------------
+
+
+@attr.s(auto_attribs=True, slots=True)
 class HotwordError(Message):
     """Error from Hotword component."""
 
@@ -75,3 +81,44 @@ class HotwordError(Message):
     def topic(cls, **kwargs) -> str:
         """Get Hermes topic"""
         return "hermes/error/hotword"
+
+
+@attr.s(auto_attribs=True, slots=True)
+class GetHotwords(Message):
+    """Request to list available hotwords."""
+
+    id: str = ""
+    siteId: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic"""
+        return "rhasspy/hotword/getHotwords"
+
+
+@attr.s(auto_attribs=True, slots=True)
+class Hotword:
+    """Description of a single hotword (used in hotwords message)."""
+
+    # Unique ID of hotword model
+    modelId: str
+
+    # Actual words used to activate hotword
+    modelWords: str
+
+    modelVersion: str = ""
+    modelType: str = "personal"
+
+
+@attr.s(auto_attribs=True, slots=True)
+class Hotwords(Message):
+    """Response to getHotwords."""
+
+    models: typing.Dict[str, Hotword] = {}
+    id: str = ""
+    siteId: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic"""
+        return "rhasspy/hotword/hotwords"
