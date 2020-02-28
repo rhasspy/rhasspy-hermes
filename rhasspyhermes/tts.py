@@ -1,6 +1,7 @@
 """Messages for hermes/tts"""
-import attr
 import typing
+
+import attr
 
 from .base import Message
 
@@ -31,9 +32,11 @@ class TtsSayFinished(Message):
     def topic(cls, **kwargs) -> str:
         return "hermes/tts/sayFinished"
 
+
 # -----------------------------------------------------------------------------
 # Rhasspy Only
 # -----------------------------------------------------------------------------
+
 
 @attr.s(auto_attribs=True, slots=True)
 class GetVoices(Message):
@@ -46,10 +49,14 @@ class GetVoices(Message):
     def topic(cls, **kwargs) -> str:
         return "rhasspy/tts/getVoices"
 
+
 @attr.s(auto_attribs=True, slots=True)
 class Voice:
+    """Information about a single TTS voice."""
+
     voiceId: str
     description: str = ""
+
 
 @attr.s(auto_attribs=True, slots=True)
 class Voices(Message):
