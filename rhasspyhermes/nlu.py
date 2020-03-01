@@ -24,6 +24,23 @@ class NluQuery(Message):
 
 
 @attr.s(auto_attribs=True, slots=True)
+class NluIntentParsed(Message):
+    """Intent successfully parsed."""
+
+    input: str
+    intent: Intent
+    slots: typing.List[Slot] = attr.Factory(list)
+    id: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
+        return f"hermes/nlu/intentParsed"
+
+
+@attr.s(auto_attribs=True, slots=True)
 class NluIntent(Message):
     """Intent recognized."""
 
