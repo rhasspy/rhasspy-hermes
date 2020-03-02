@@ -18,6 +18,8 @@ class SlotRange:
 
     start: int
     end: int
+    raw_start: typing.Optional[int] = None
+    raw_end: typing.Optional[int] = None
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -30,6 +32,40 @@ class Slot:
     raw_value: str
     value: str
     range: typing.Optional[SlotRange] = None
+
+    @property
+    def start(self) -> int:
+        if self.range:
+            return self.range.start
+
+        return -1
+
+    @property
+    def raw_start(self) -> int:
+        if self.range:
+            value = self.range.raw_start
+
+        if value is None:
+            return self.start
+
+        return value
+
+    @property
+    def end(self) -> int:
+        if self.range:
+            return self.range.end
+
+        return -1
+
+    @property
+    def raw_end(self) -> int:
+        if self.range:
+            value = self.range.raw_end
+
+        if value is None:
+            return self.end
+
+        return value
 
     @classmethod
     def from_dict(cls, object_dict: typing.Dict[str, typing.Any]):

@@ -55,6 +55,7 @@ class NluIntent(Message):
     customData: str = ""
     asrTokens: typing.List[str] = attr.Factory(list)
     asrConfidence: float = 1.0
+    rawAsrTokens: typing.List[str] = attr.Factory(list)
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -89,6 +90,9 @@ class NluIntent(Message):
     @property
     def raw_input(self):
         """Get raw input from ASR."""
+        if self.rawAsrTokens:
+            return " ".join(self.rawAsrTokens)
+
         if self.asrTokens:
             return " ".join(self.asrTokens)
 
@@ -102,12 +106,22 @@ class NluIntent(Message):
                 "confidence": self.intent.confidenceScore,
             },
             "entities": [
-                {"entity": s.slotName, "value": s.value, "raw_value": s.raw_value}
+                {
+                    "entity": s.slotName,
+                    "value": s.value,
+                    "raw_value": s.raw_value,
+                    "start": s.start,
+                    "stop": s.end,
+                    "raw_start": (s.raw_start if s.raw_start is not None else s.start),
+                    "raw_stop": (s.raw_end if s.raw_end is not None else s.end),
+                }
                 for s in self.slots
             ],
             "slots": {s.slotName: s.value for s in self.slots},
             "text": self.input,
             "raw_text": self.raw_input,
+            "tokens": self.asrTokens,
+            "raw_tokens": self.rawAsrTokens,
         }
 
 
