@@ -35,13 +35,15 @@ class Slot:
 
     @property
     def start(self) -> int:
+        """Get start index of slot value"""
         if self.range:
             return self.range.start
 
-        return -1
+        return 0
 
     @property
     def raw_start(self) -> int:
+        """Get start index of raw slot value"""
         if self.range:
             value = self.range.raw_start
 
@@ -52,6 +54,7 @@ class Slot:
 
     @property
     def end(self) -> int:
+        """Get end index (exclusive) of slot value"""
         if self.range:
             return self.range.end
 
@@ -59,6 +62,7 @@ class Slot:
 
     @property
     def raw_end(self) -> int:
+        """Get end index (exclusive) of raw slot value"""
         if self.range:
             value = self.range.raw_end
 

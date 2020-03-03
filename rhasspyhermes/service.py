@@ -1,5 +1,9 @@
 """Messages shared across services."""
+import typing
+
 import attr
+
+from .base import Message
 
 
 @attr.s(auto_attribs=True, slots=True)
