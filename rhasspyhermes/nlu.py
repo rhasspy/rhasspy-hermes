@@ -111,9 +111,9 @@ class NluIntent(Message):
                     "value": s.value,
                     "raw_value": s.raw_value,
                     "start": s.start,
-                    "stop": s.end,
+                    "end": s.end,
                     "raw_start": (s.raw_start if s.raw_start is not None else s.start),
-                    "raw_stop": (s.raw_end if s.raw_end is not None else s.end),
+                    "raw_end": (s.raw_end if s.raw_end is not None else s.end),
                 }
                 for s in self.slots
             ],
