@@ -36,9 +36,10 @@ class AsrStartListening(Message):
     siteId: str = "default"
     sessionId: str = ""
 
-    # Rhasspy-specific
+    # Rhasspy only
     stopOnSilence: bool = True
     sendAudioCaptured: bool = False
+    wakewordId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -67,6 +68,9 @@ class AsrTextCaptured(Message):
 
     siteId: str = "default"
     sessionId: str = ""
+
+    # Rhasspy only
+    wakewordId: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:

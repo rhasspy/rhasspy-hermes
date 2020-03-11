@@ -18,6 +18,9 @@ class NluQuery(Message):
     siteId: str = "default"
     sessionId: str = ""
 
+    # Rhasspy only
+    wakewordId: str = ""
+
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/nlu/query"
@@ -55,6 +58,9 @@ class NluIntent(Message):
     customData: str = ""
     asrTokens: typing.List[str] = attr.Factory(list)
     asrConfidence: float = 1.0
+
+    # Rhasspy only
+    wakewordId: str = ""
     rawAsrTokens: typing.List[str] = attr.Factory(list)
 
     @classmethod
@@ -122,6 +128,7 @@ class NluIntent(Message):
             "raw_text": self.raw_input,
             "tokens": self.asrTokens,
             "raw_tokens": self.rawAsrTokens,
+            "wakewordId": self.wakewordId,
         }
 
 
