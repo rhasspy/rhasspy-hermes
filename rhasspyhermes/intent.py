@@ -3,6 +3,8 @@ import typing
 
 import attr
 
+from . import utils
+
 
 @attr.s(auto_attribs=True, slots=True)
 class Intent:
@@ -74,6 +76,7 @@ class Slot:
     @classmethod
     def from_dict(cls, object_dict: typing.Dict[str, typing.Any]):
         """Parse into Slot object from dictionary."""
+        object_dict = utils.only_fields(cls, object_dict)
         slot_range = object_dict.pop("range")
         slot = Slot(**object_dict)
         if slot_range:

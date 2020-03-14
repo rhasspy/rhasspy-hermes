@@ -63,6 +63,7 @@ class G2pPhonemes(Message):
     @classmethod
     def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
         """Construct message from dictionary."""
+        message_dict = cls.only_fields(message_dict)
         word_phonemes = message_dict.pop("wordPhonemes", {})
         message = G2pPhonemes(**message_dict)
         message.wordPhonemes = {

@@ -179,6 +179,7 @@ class AudioDevices(Message):
     @classmethod
     def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
         """Construct message from dictionary."""
+        message_dict = cls.only_fields(message_dict)
         device_dicts = message_dict.pop("devices", [])
         devices = [AudioDevice(**d) for d in device_dicts]
 

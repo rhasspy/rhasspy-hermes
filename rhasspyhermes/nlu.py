@@ -84,6 +84,7 @@ class NluIntent(Message):
     @classmethod
     def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
         """Construct message from dictionary."""
+        message_dict = message_dict.only_fields(message_dict)
         intent_dict = message_dict.pop("intent", {})
         slot_dicts = message_dict.pop("slots", [])
         message = NluIntent(  # type: ignore
