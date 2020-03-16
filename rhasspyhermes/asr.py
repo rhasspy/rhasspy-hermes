@@ -104,7 +104,8 @@ class AsrTrain(Message):
     TOPIC_PATTERN = re.compile(r"^rhasspy/asr/([^/]+)/train$")
 
     id: str
-    graph_dict: typing.Dict[str, typing.Any]
+    graph_path: str = attr.ib()
+    graph_format: str = "pickle-gzip"
 
     @classmethod
     def topic(cls, **kwargs) -> str:

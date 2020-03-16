@@ -184,7 +184,8 @@ class NluTrain(Message):
     TOPIC_PATTERN = re.compile(r"^rhasspy/nlu/([^/]+)/train$")
 
     id: str = attr.ib()
-    graph_dict: typing.Dict[str, typing.Any] = attr.ib()
+    graph_path: str = attr.ib()
+    graph_format: str = "pickle-gzip"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
