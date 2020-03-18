@@ -19,10 +19,22 @@ class AudioFrame(Message):
 
     wav_bytes: bytes
 
+    def payload(self) -> typing.Union[str, bytes]:
+        """Get binary/string for this message."""
+        return self.wav_bytes
+
+    @classmethod
+    def is_binary_payload(cls) -> bool:
+        return True
+
+    @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "default")
+        siteId = kwargs.get("siteId", "+")
         return f"hermes/audioServer/{siteId}/audioFrame"
 
     @classmethod
@@ -72,10 +84,14 @@ class AudioPlayBytes(Message):
 
     wav_bytes: bytes
 
+    def payload(self) -> typing.Union[str, bytes]:
+        """Get binary/string for this message."""
+        return self.wav_bytes
+
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "default")
+        siteId = kwargs.get("siteId", "+")
         requestId = kwargs.get("requestId") or str(uuid4())
         return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
 
@@ -111,7 +127,7 @@ class AudioPlayFinished(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "default")
+        siteId = kwargs.get("siteId", "+")
         return f"hermes/audioServer/{siteId}/playFinished"
 
     @classmethod
@@ -201,11 +217,27 @@ class AudioSessionFrame(Message):
 
     wav_bytes: bytes
 
+    def payload(self) -> typing.Union[str, bytes]:
+        """Get binary/string for this message."""
+        return self.wav_bytes
+
+    @classmethod
+    def is_binary_payload(cls) -> bool:
+        return True
+
+    @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
+    def is_session_in_topic(cls) -> bool:
+        return True
+
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "default")
-        sessionId = kwargs.get("sessionId", "")
+        siteId = kwargs.get("siteId", "+")
+        sessionId = kwargs.get("sessionId", "+")
         return f"hermes/audioServer/{siteId}/{sessionId}/audioSessionFrame"
 
     @classmethod

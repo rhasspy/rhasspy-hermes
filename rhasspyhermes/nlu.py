@@ -66,7 +66,7 @@ class NluIntent(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message (intentName)."""
-        intentName = kwargs["intentName"]
+        intentName = kwargs.get("intentName", "#")
         return f"hermes/intent/{intentName}"
 
     @classmethod
@@ -188,9 +188,13 @@ class NluTrain(Message):
     graph_format: str = "pickle-gzip"
 
     @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
-        siteId = kwargs.get("siteId", "default")
+        siteId = kwargs.get("siteId", "+")
         return f"rhasspy/nlu/{siteId}/train"
 
     @classmethod
@@ -217,7 +221,7 @@ class NluTrainSuccess(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
-        siteId = kwargs.get("siteId", "default")
+        siteId = kwargs.get("siteId", "+")
         return f"rhasspy/nlu/{siteId}/trainSuccess"
 
     @classmethod

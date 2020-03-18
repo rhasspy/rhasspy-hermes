@@ -48,7 +48,7 @@ class HotwordDetected(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message (wakewordId)."""
-        wakewordId = kwargs.get("wakewordId", "default")
+        wakewordId = kwargs.get("wakewordId", "+")
         return f"hermes/hotword/{wakewordId}/detected"
 
     @classmethod

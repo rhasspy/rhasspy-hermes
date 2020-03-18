@@ -108,9 +108,13 @@ class AsrTrain(Message):
     graph_format: str = "pickle-gzip"
 
     @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
-        siteId = kwargs.get("siteId", "default")
+        siteId = kwargs.get("siteId", "+")
         return f"rhasspy/asr/{siteId}/train"
 
     @classmethod
@@ -137,7 +141,7 @@ class AsrTrainSuccess(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
-        siteId = kwargs.get("siteId", "default")
+        siteId = kwargs.get("siteId", "+")
         return f"rhasspy/asr/{siteId}/trainSuccess"
 
     @classmethod
@@ -161,10 +165,26 @@ class AsrAudioCaptured(Message):
 
     wav_bytes: bytes
 
+    def payload(self) -> typing.Union[str, bytes]:
+        """Get binary/string for this message."""
+        return self.wav_bytes
+
+    @classmethod
+    def is_binary_payload(cls) -> bool:
+        return True
+
+    @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
+    def is_session_in_topic(cls) -> bool:
+        return True
+
     @classmethod
     def topic(cls, **kwargs) -> str:
-        siteId = kwargs.get("siteId", "default")
-        sessionId = kwargs.get("siteId", "")
+        siteId = kwargs.get("siteId", "+")
+        sessionId = kwargs.get("siteId", "+")
         return f"rhasspy/asr/{siteId}/{sessionId}/audioCaptured"
 
     @classmethod

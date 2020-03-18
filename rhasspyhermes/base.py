@@ -1,6 +1,9 @@
 """Support for Snips Hermes protocol."""
+import json
 import typing
 from abc import ABC, abstractmethod
+
+import attr
 
 from . import utils
 
@@ -10,6 +13,28 @@ class Message(ABC):
 
     def __init__(self, **kwargs):
         pass
+
+    def payload(self) -> typing.Union[str, bytes]:
+        """Get binary/string for this message."""
+        try:
+            return json.dumps(attr.asdict(self))
+        except attr.exceptions.NotAnAttrsClassError:
+            return json.dumps(self.__dict__)
+
+    @classmethod
+    def is_binary_payload(cls) -> bool:
+        """True if message payload is not JSON."""
+        return False
+
+    @classmethod
+    def is_site_in_topic(cls) -> bool:
+        """True if siteId is part of topic."""
+        return False
+
+    @classmethod
+    def is_session_in_topic(cls) -> bool:
+        """True if sessionId is part of topic."""
+        return False
 
     @classmethod
     @abstractmethod
