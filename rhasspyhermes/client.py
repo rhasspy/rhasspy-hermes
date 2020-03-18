@@ -9,6 +9,7 @@ import typing
 import wave
 from abc import ABC, abstractmethod
 
+from .audioserver import AudioFrame, AudioSessionFrame
 from .base import Message
 
 # -----------------------------------------------------------------------------
@@ -144,8 +145,6 @@ class HermesClient(ABC):
         while True:
             try:
                 mqtt_message = await self.in_queue.get()
-                self.logger.debug("Parsing message on %s", mqtt_message.topic)
-
                 # Check against all known message types
                 for message_type in self.subscribed_types:
                     if message_type.is_topic(mqtt_message.topic):
@@ -159,11 +158,12 @@ class HermesClient(ABC):
 
                             # Assume payload is only argument
                             message = message_type(mqtt_message.payload)
-                            self.logger.debug(
-                                "<- %s(%s byte(s))",
-                                message_type.__name__,
-                                len(mqtt_message.payload),
-                            )
+                            if not isinstance(message, (AudioFrame, AudioSessionFrame)):
+                                self.logger.debug(
+                                    "<- %s(%s byte(s))",
+                                    message_type.__name__,
+                                    len(mqtt_message.payload),
+                                )
                         else:
                             # JSON
                             json_payload = json.loads(mqtt_message.payload)
