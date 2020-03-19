@@ -1,10 +1,10 @@
 """Messages for hermes/audioServer"""
 import io
 import re
+import time
 import typing
 import wave
 from enum import Enum
-from uuid import uuid4
 
 import attr
 
@@ -51,7 +51,7 @@ class AudioFrame(Message):
 
     @classmethod
     def iter_wav_chunked(
-        cls, wav_io: typing.BinaryIO, frames_per_chunk: int
+        cls, wav_io: typing.BinaryIO, frames_per_chunk: int, live_delay: bool = False
     ) -> typing.Iterable[bytes]:
         """Split single WAV into multiple WAV chunks"""
         with wave.open(wav_io) as in_wav:
@@ -71,9 +71,23 @@ class AudioFrame(Message):
                         out_wav.setnchannels(in_wav.getnchannels())
                         out_wav.writeframes(chunk)
 
-                    yield out_io.getvalue()
+                    wav_bytes = out_io.getvalue()
+                    yield wav_bytes
+
+                    if live_delay:
+                        time.sleep(AudioFrame.get_wav_duration(wav_bytes))
 
                 frames_left -= frames_per_chunk
+
+    @classmethod
+    def get_wav_duration(cls, wav_bytes: bytes) -> float:
+        """Return the real-time duration of a WAV file"""
+        with io.BytesIO(wav_bytes) as wav_buffer:
+            wav_file: wave.Wave_read = wave.open(wav_buffer, "rb")
+            with wav_file:
+                frames = wav_file.getnframes()
+                rate = wav_file.getframerate()
+                return frames / float(rate)
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -89,10 +103,18 @@ class AudioPlayBytes(Message):
         return self.wav_bytes
 
     @classmethod
+    def is_binary_payload(cls) -> bool:
+        return True
+
+    @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
         siteId = kwargs.get("siteId", "+")
-        requestId = kwargs.get("requestId") or str(uuid4())
+        requestId = kwargs.get("requestId", "#")
         return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
 
     @classmethod

@@ -43,7 +43,7 @@ class HotwordDetected(Message):
 
     # Rhasspy specific
     sessionId: str = ""
-    sendAudioCaptured: bool = False
+    sendAudioCaptured: typing.Optional[bool] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:

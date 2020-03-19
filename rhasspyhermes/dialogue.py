@@ -65,6 +65,20 @@ class DialogueStartSession(Message):
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/startSession"
 
+    @classmethod
+    def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
+        """Construct message from dictionary."""
+        message_dict = cls.only_fields(message_dict)
+        init_dict = message_dict.pop("init")
+        assert init_dict, "init is required"
+
+        if init_dict["type"] == "action":
+            init = DialogueAction(**init_dict)
+        else:
+            init = DialogueNotification(**init_dict)
+
+        return DialogueStartSession(**message_dict, init=init)
+
 
 @attr.s(auto_attribs=True, slots=True)
 class DialogueSessionQueued(Message):

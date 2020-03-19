@@ -55,6 +55,7 @@ class HermesClient:
 
         # Set of valid siteIds (empty for all)
         self.siteIds: typing.Set[str] = set(siteIds) if siteIds else set()
+        self.siteId = "default" if not siteIds else siteIds[0]
 
         # Event loop
         self.loop = loop or asyncio.get_event_loop()
@@ -111,6 +112,10 @@ class HermesClient:
         """Override to handle Hermes messages."""
         self.logger.debug("Not handled: %s", message)
 
+    def stop(self):
+        """Stop message handler gracefully."""
+        asyncio.run_coroutine_threadsafe(self.in_queue.put(None), self.loop)
+
     # -------------------------------------------------------------------------
     # MQTT Event Handlers
     # -------------------------------------------------------------------------
@@ -144,9 +149,12 @@ class HermesClient:
 
     async def handle_messages_async(self):
         """Handles MQTT messages in event loop."""
-        while True:
+        while self.loop.is_running():
             try:
                 mqtt_message = await self.in_queue.get()
+                if mqtt_message is None:
+                    break
+
                 # Check against all known message types
                 for message_type in self.subscribed_types:
                     if message_type.is_topic(mqtt_message.topic):
@@ -158,7 +166,7 @@ class HermesClient:
                                 if not self.valid_siteId(siteId):
                                     continue
 
-                            # Assume payload is only argument
+                            # Assume payload is only argument to constructor
                             message = message_type(mqtt_message.payload)
                             if not isinstance(message, (AudioFrame, AudioSessionFrame)):
                                 self.logger.debug(
@@ -185,11 +193,14 @@ class HermesClient:
                         if message_type.is_session_in_topic():
                             sessionId = message_type.get_sessionId(mqtt_message.topic)
 
-                        await self.on_message(
-                            message,
-                            siteId=siteId,
-                            sessionId=sessionId,
-                            topic=mqtt_message.topic,
+                        asyncio.ensure_future(
+                            self.on_message(
+                                message,
+                                siteId=siteId,
+                                sessionId=sessionId,
+                                topic=mqtt_message.topic,
+                            ),
+                            loop=self.loop,
                         )
 
                         # Assume only one message type will match
