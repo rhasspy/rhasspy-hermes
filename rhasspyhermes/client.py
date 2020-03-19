@@ -7,7 +7,6 @@ import subprocess
 import threading
 import typing
 import wave
-from abc import ABC, abstractmethod
 
 from .audioserver import AudioFrame, AudioSessionFrame
 from .base import Message
@@ -22,7 +21,7 @@ GeneratorType = typing.AsyncIterable[
 # -----------------------------------------------------------------------------
 
 
-class HermesClient(ABC):
+class HermesClient:
     """Base class for Hermes MQTT clients"""
 
     def __init__(
@@ -102,9 +101,12 @@ class HermesClient(ABC):
 
                 self.pending_mqtt_topics.clear()
 
-    @abstractmethod
     async def on_message(
-        self, message: Message, siteId=None, sessionId=None, topic=None
+        self,
+        message: Message,
+        siteId: typing.Optional[str] = None,
+        sessionId: typing.Optional[str] = None,
+        topic: typing.Optional[str] = None,
     ):
         """Override to handle Hermes messages."""
         self.logger.debug("Not handled: %s", message)
@@ -208,13 +210,16 @@ class HermesClient(ABC):
             payload = message.payload()
 
             if message.is_binary_payload():
-                self.logger.debug(
-                    "-> %s(%s byte(s))", message.__class__.__name__, len(payload)
-                )
+                # Don't log audio frames
+                if not isinstance(message, (AudioFrame, AudioSessionFrame)):
+                    self.logger.debug(
+                        "-> %s(%s byte(s))", message.__class__.__name__, len(payload)
+                    )
             else:
+                # Log all JSON messages
                 self.logger.debug("-> %s", message)
+                self.logger.debug("Publishing %s bytes(s) to %s", len(payload), topic)
 
-            self.logger.debug("Publishing %s bytes(s) to %s", len(payload), topic)
             self.mqtt_client.publish(topic, payload)
         except Exception:
             self.logger.exception("publish")
