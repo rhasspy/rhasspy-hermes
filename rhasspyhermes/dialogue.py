@@ -73,11 +73,13 @@ class DialogueStartSession(Message):
         assert init_dict, "init is required"
 
         if init_dict["type"] == "action":
-            init = DialogueAction(**init_dict)
-        else:
-            init = DialogueNotification(**init_dict)
+            return DialogueStartSession(  # type: ignore
+                **message_dict, init=DialogueAction(**init_dict)
+            )
 
-        return DialogueStartSession(**message_dict, init=init)
+        return DialogueStartSession(  # type: ignore
+            **message_dict, init=DialogueNotification(**init_dict)
+        )
 
 
 @attr.s(auto_attribs=True, slots=True)
