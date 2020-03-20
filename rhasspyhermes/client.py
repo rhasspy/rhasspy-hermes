@@ -43,6 +43,9 @@ class HermesClient:
         self.mqtt_client.on_disconnect = self.mqtt_on_disconnect
         self.mqtt_client.on_message = self.mqtt_on_message
 
+        # Set when on_connect succeeds
+        self.mqtt_connected_event: asyncio.Event = asyncio.Event()
+
         self.is_connected: bool = False
         self.subscribe_lock = threading.Lock()
         self.pending_mqtt_topics: typing.Set[str] = set()
@@ -130,6 +133,7 @@ class HermesClient:
             self.is_connected = True
             self.logger.debug("Connected to MQTT broker")
             self.subscribe()
+            self.loop.call_soon_threadsafe(self.mqtt_connected_event.set)
         except Exception:
             self.logger.exception("on_connect")
 
@@ -137,6 +141,7 @@ class HermesClient:
         """Automatically reconnect when disconnected."""
         try:
             # Automatically reconnect
+            self.loop.call_soon_threadsafe(self.mqtt_connected_event.clear)
             self.is_connected = False
             self.logger.warning("Disconnected. Trying to reconnect...")
             self.mqtt_client.reconnect()
