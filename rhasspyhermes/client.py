@@ -112,6 +112,10 @@ class HermesClient:
         """Override to handle Hermes messages."""
         self.logger.debug("Not handled: %s", message)
 
+    async def on_raw_message(self, topic: str, payload: bytes):
+        """Override to handle MQTT messages."""
+        pass
+
     def stop(self):
         """Stop message handler gracefully."""
         asyncio.run_coroutine_threadsafe(self.in_queue.put(None), self.loop)
@@ -155,6 +159,11 @@ class HermesClient:
                 if mqtt_message is None:
                     break
 
+                # Fire and forget
+                asyncio.ensure_future(
+                    self.on_raw_message(mqtt_message.topic, mqtt_message.payload)
+                )
+
                 # Check against all known message types
                 for message_type in self.subscribed_types:
                     if message_type.is_topic(mqtt_message.topic):
@@ -193,6 +202,7 @@ class HermesClient:
                         if message_type.is_session_in_topic():
                             sessionId = message_type.get_sessionId(mqtt_message.topic)
 
+                        # Fire and forget
                         asyncio.ensure_future(
                             self.on_message(
                                 message,
@@ -255,8 +265,23 @@ class HermesClient:
 
         return True
 
-    def convert_wav(self, wav_bytes: bytes) -> bytes:
+    def convert_wav(
+        self,
+        wav_bytes: bytes,
+        sample_rate: typing.Optional[int] = None,
+        sample_width: typing.Optional[int] = None,
+        channels: typing.Optional[int] = None,
+    ) -> bytes:
         """Converts WAV data to required format with sox. Return raw audio."""
+        if sample_rate is None:
+            sample_rate = self.sample_rate
+
+        if sample_width is None:
+            sample_width = self.sample_width
+
+        if channels is None:
+            channels = self.channels
+
         return subprocess.run(
             [
                 "sox",
@@ -264,13 +289,13 @@ class HermesClient:
                 "wav",
                 "-",
                 "-r",
-                str(self.sample_rate),
+                str(sample_rate),
                 "-e",
                 "signed-integer",
                 "-b",
-                str(self.sample_width * 8),
+                str(sample_width * 8),
                 "-c",
-                str(self.channels),
+                str(channels),
                 "-t",
                 "raw",
                 "-",
@@ -280,29 +305,61 @@ class HermesClient:
             input=wav_bytes,
         ).stdout
 
-    def maybe_convert_wav(self, wav_bytes: bytes) -> bytes:
+    def maybe_convert_wav(
+        self,
+        wav_bytes: bytes,
+        sample_rate: typing.Optional[int] = None,
+        sample_width: typing.Optional[int] = None,
+        channels: typing.Optional[int] = None,
+    ) -> bytes:
         """Converts WAV data to required format if necessary. Returns raw audio."""
+        if sample_rate is None:
+            sample_rate = self.sample_rate
+
+        if sample_width is None:
+            sample_width = self.sample_width
+
+        if channels is None:
+            channels = self.channels
+
         with io.BytesIO(wav_bytes) as wav_io:
             with wave.open(wav_io, "rb") as wav_file:
                 if (
-                    (wav_file.getframerate() != self.sample_rate)
-                    or (wav_file.getsampwidth() != self.sample_width)
-                    or (wav_file.getnchannels() != self.channels)
+                    (wav_file.getframerate() != sample_rate)
+                    or (wav_file.getsampwidth() != sample_width)
+                    or (wav_file.getnchannels() != channels)
                 ):
                     # Return converted wav
-                    return self.convert_wav(wav_bytes)
+                    return self.convert_wav(
+                        wav_bytes, sample_rate, sample_width, channels
+                    )
 
                 # Return original audio
                 return wav_file.readframes(wav_file.getnframes())
 
-    def to_wav_bytes(self, audio_data: bytes) -> bytes:
+    def to_wav_bytes(
+        self,
+        audio_data: bytes,
+        sample_rate: typing.Optional[int] = None,
+        sample_width: typing.Optional[int] = None,
+        channels: typing.Optional[int] = None,
+    ) -> bytes:
         """Wrap raw audio data in WAV."""
+        if sample_rate is None:
+            sample_rate = self.sample_rate
+
+        if sample_width is None:
+            sample_width = self.sample_width
+
+        if channels is None:
+            channels = self.channels
+
         with io.BytesIO() as wav_buffer:
             wav_file: wave.Wave_write = wave.open(wav_buffer, mode="wb")
             with wav_file:
-                wav_file.setframerate(self.sample_rate)
-                wav_file.setsampwidth(self.sample_width)
-                wav_file.setnchannels(self.channels)
+                wav_file.setframerate(sample_rate)
+                wav_file.setsampwidth(sample_width)
+                wav_file.setnchannels(channels)
                 wav_file.writeframes(audio_data)
 
             return wav_buffer.getvalue()
