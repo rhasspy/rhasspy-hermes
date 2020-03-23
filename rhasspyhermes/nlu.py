@@ -219,6 +219,10 @@ class NluTrainSuccess(Message):
     id: str = attr.ib()
 
     @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
         siteId = kwargs.get("siteId", "+")
