@@ -8,14 +8,14 @@ import threading
 import typing
 import wave
 
-from .audioserver import AudioFrame, AudioSessionFrame
+from .audioserver import AudioFrame, AudioSessionFrame, AudioSummary
 from .base import Message
 
 # -----------------------------------------------------------------------------
 
 TopicArgs = typing.Mapping[str, typing.Any]
 GeneratorType = typing.AsyncIterable[
-    typing.Union[Message, typing.Tuple[Message, TopicArgs]]
+    typing.Optional[typing.Union[Message, typing.Tuple[Message, TopicArgs]]]
 ]
 
 # -----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ class HermesClient:
         topic: typing.Optional[str] = None,
     ) -> GeneratorType:
         """Override to handle Hermes messages."""
-        yield
+        yield None
 
     async def on_raw_message(self, topic: str, payload: bytes):
         """Override to handle MQTT messages."""
@@ -201,21 +201,24 @@ class HermesClient:
 
                             # Load from JSON
                             message = message_type.from_dict(json_payload)
-                            self.logger.debug("<- %s", message)
+
+                            if not isinstance(message, AudioSummary):
+                                self.logger.debug("<- %s", message)
 
                         sessionId = None
                         if message_type.is_session_in_topic():
                             sessionId = message_type.get_sessionId(mqtt_message.topic)
 
                         # Publish all responses
-                        self.publish_all(
-                            self.on_message(
-                                message,
-                                siteId=siteId,
-                                sessionId=sessionId,
-                                topic=mqtt_message.topic,
-                            ),
-                            loop=self.loop,
+                        asyncio.ensure_future(
+                            self.publish_all(
+                                self.on_message(
+                                    message,
+                                    siteId=siteId,
+                                    sessionId=sessionId,
+                                    topic=mqtt_message.topic,
+                                )
+                            )
                         )
 
                         # Assume only one message type will match
@@ -242,9 +245,12 @@ class HermesClient:
                         "-> %s(%s byte(s))", message.__class__.__name__, len(payload)
                     )
             else:
-                # Log all JSON messages
-                self.logger.debug("-> %s", message)
-                self.logger.debug("Publishing %s bytes(s) to %s", len(payload), topic)
+                # Log most JSON messages
+                if not isinstance(message, AudioSummary):
+                    self.logger.debug("-> %s", message)
+                    self.logger.debug(
+                        "Publishing %s bytes(s) to %s", len(payload), topic
+                    )
 
             self.mqtt_client.publish(topic, payload)
         except Exception:
@@ -253,6 +259,9 @@ class HermesClient:
     async def publish_all(self, async_generator: GeneratorType):
         """Enumerate all messages in an async generator publish them"""
         async for maybe_message in async_generator:
+            if maybe_message is None:
+                continue
+
             if isinstance(maybe_message, Message):
                 self.publish(maybe_message)
             else:
@@ -336,7 +345,10 @@ class HermesClient:
                 ):
                     # Return converted wav
                     return self.convert_wav(
-                        wav_bytes, sample_rate, sample_width, channels
+                        wav_bytes,
+                        sample_rate=sample_rate,
+                        sample_width=sample_width,
+                        channels=channels,
                     )
 
                 # Return original audio

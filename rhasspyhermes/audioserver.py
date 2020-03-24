@@ -1,4 +1,5 @@
 """Messages for hermes/audioServer"""
+import audioop
 import io
 import re
 import time
@@ -280,3 +281,71 @@ class AudioSessionFrame(Message):
     def is_topic(cls, topic: str) -> bool:
         """True if topic matches template"""
         return re.match(AudioSessionFrame.TOPIC_PATTERN, topic) is not None
+
+
+@attr.s(auto_attribs=True, slots=True)
+class AudioSummary(Message):
+    """Summary of recent audio frame(s) for diagnostic purposes."""
+
+    TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/audioSummary$")
+
+    debiased_energy: float
+    is_speech: typing.Optional[bool] = None
+
+    @classmethod
+    def get_debiased_energy(cls, audio_data: bytes) -> float:
+        """Compute RMS of debiased audio."""
+        # Thanks to the speech_recognition library!
+        # https://github.com/Uberi/speech_recognition/blob/master/speech_recognition/__init__.py
+        energy = -audioop.rms(audio_data, 2)
+        energy_bytes = bytes([energy & 0xFF, (energy >> 8) & 0xFF])
+        debiased_energy = audioop.rms(
+            audioop.add(audio_data, energy_bytes * (len(audio_data) // 2), 2), 2
+        )
+
+        # Probably actually audio if > 30
+        return debiased_energy
+
+    @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
+        siteId = kwargs.get("siteId", "+")
+        return f"hermes/audioServer/{siteId}/audioSummary"
+
+    @classmethod
+    def get_siteId(cls, topic: str) -> str:
+        """Get siteId from a topic"""
+        match = re.match(AudioSummary.TOPIC_PATTERN, topic)
+        assert match, "Not an audioSummary topic"
+        return match.group(1)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(AudioSummary.TOPIC_PATTERN, topic) is not None
+
+
+@attr.s(auto_attribs=True, slots=True)
+class SummaryToggleOn(Message):
+    """Activate sending of audio summaries."""
+
+    siteId: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        return "hermes/audioServer/toggleSummaryOn"
+
+
+@attr.s(auto_attribs=True, slots=True)
+class SummaryToggleOff(Message):
+    """Deactivate sending of audio summaries."""
+
+    siteId: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        return "hermes/audioServer/toggleSummaryOff"
