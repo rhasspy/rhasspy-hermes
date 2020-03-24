@@ -111,9 +111,9 @@ class HermesClient:
         siteId: typing.Optional[str] = None,
         sessionId: typing.Optional[str] = None,
         topic: typing.Optional[str] = None,
-    ):
+    ) -> GeneratorType:
         """Override to handle Hermes messages."""
-        self.logger.debug("Not handled: %s", message)
+        yield
 
     async def on_raw_message(self, topic: str, payload: bytes):
         """Override to handle MQTT messages."""
@@ -207,8 +207,8 @@ class HermesClient:
                         if message_type.is_session_in_topic():
                             sessionId = message_type.get_sessionId(mqtt_message.topic)
 
-                        # Fire and forget
-                        asyncio.ensure_future(
+                        # Publish all responses
+                        self.publish_all(
                             self.on_message(
                                 message,
                                 siteId=siteId,
