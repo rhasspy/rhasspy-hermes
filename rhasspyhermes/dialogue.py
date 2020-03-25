@@ -1,8 +1,7 @@
 """Messages for hermes/dialogueManager"""
 import typing
+from dataclasses import dataclass
 from enum import Enum
-
-import attr
 
 from .base import Message
 
@@ -14,7 +13,7 @@ class DialogueActionType(str, Enum):
     NOTIFICATION = "notification"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueAction:
     """Dialogue session action."""
 
@@ -25,7 +24,7 @@ class DialogueAction:
     sendIntentNotRecognized: bool = False
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueNotification:
     """Dialogue session notification."""
 
@@ -43,7 +42,7 @@ class DialogueSessionTerminationReason(str, Enum):
     ERROR = "error"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueSessionTermination:
     """Dialogue session termination type."""
 
@@ -53,7 +52,7 @@ class DialogueSessionTermination:
 # -----------------------------------------------------------------------------
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueStartSession(Message):
     """Start a dialogue session."""
 
@@ -82,7 +81,7 @@ class DialogueStartSession(Message):
         )
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueSessionQueued(Message):
     """Sent when a dialogue session has been queued."""
 
@@ -95,7 +94,7 @@ class DialogueSessionQueued(Message):
         return "hermes/dialogueManager/sessionQueued"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueSessionStarted(Message):
     """Sent when a dialogue session has been started."""
 
@@ -108,7 +107,7 @@ class DialogueSessionStarted(Message):
         return "hermes/dialogueManager/sessionStarted"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueContinueSession(Message):
     """Sent when a dialogue session should be continued."""
 
@@ -125,7 +124,7 @@ class DialogueContinueSession(Message):
         return "hermes/dialogueManager/continueSession"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueEndSession(Message):
     """Sent when a dialogue session should be ended."""
 
@@ -137,7 +136,7 @@ class DialogueEndSession(Message):
         return "hermes/dialogueManager/endSession"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueSessionEnded(Message):
     """Sent when a dialogue session has ended."""
 
@@ -151,7 +150,7 @@ class DialogueSessionEnded(Message):
         return "hermes/dialogueManager/sessionEnded"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class DialogueIntentNotRecognized(Message):
     """Intent not recognized."""
 

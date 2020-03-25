@@ -5,14 +5,13 @@ import re
 import time
 import typing
 import wave
+from dataclasses import dataclass, field
 from enum import Enum
-
-import attr
 
 from .base import Message
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioFrame(Message):
     """Captured sound frame."""
 
@@ -91,7 +90,7 @@ class AudioFrame(Message):
                 return frames / float(rate)
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioPlayBytes(Message):
     """Play WAV sound on specific site."""
 
@@ -138,7 +137,7 @@ class AudioPlayBytes(Message):
         return re.match(AudioPlayBytes.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioPlayFinished(Message):
     """Sent when audio service has finished playing a sound."""
 
@@ -176,7 +175,7 @@ class AudioDeviceMode(str, Enum):
     OUTPUT = "output"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioDevice:
     """Description of an audio device."""
 
@@ -184,10 +183,10 @@ class AudioDevice:
     id: str
     name: str
     description: str
-    working: typing.Optional[bool] = attr.ib(default=None)
+    working: typing.Optional[bool] = None
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioGetDevices(Message):
     """Get details for audio input devices."""
 
@@ -202,13 +201,13 @@ class AudioGetDevices(Message):
         return "rhasspy/audioServer/getDevices"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioDevices(Message):
     """Response to getDevices."""
 
     id: str = ""
     siteId: str = "default"
-    devices: typing.List[AudioDevice] = attr.Factory(list)
+    devices: typing.List[AudioDevice] = field(default_factory=list)
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -230,7 +229,7 @@ class AudioDevices(Message):
 # -----------------------------------------------------------------------------
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioSessionFrame(Message):
     """Captured sound frame for a session."""
 
@@ -283,7 +282,7 @@ class AudioSessionFrame(Message):
         return re.match(AudioSessionFrame.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AudioSummary(Message):
     """Summary of recent audio frame(s) for diagnostic purposes."""
 
@@ -329,7 +328,7 @@ class AudioSummary(Message):
         return re.match(AudioSummary.TOPIC_PATTERN, topic) is not None
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class SummaryToggleOn(Message):
     """Activate sending of audio summaries."""
 
@@ -340,7 +339,7 @@ class SummaryToggleOn(Message):
         return "hermes/audioServer/toggleSummaryOn"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class SummaryToggleOff(Message):
     """Deactivate sending of audio summaries."""
 

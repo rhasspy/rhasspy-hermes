@@ -1,12 +1,11 @@
 """Messages for rhasspy/g2p"""
 import typing
-
-import attr
+from dataclasses import dataclass, field
 
 from rhasspyhermes.base import Message
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class G2pPronounce(Message):
     """Get phonetic pronunciation for words."""
 
@@ -14,7 +13,7 @@ class G2pPronounce(Message):
     id: str = ""
 
     # Words to guess pronunciations for
-    words: typing.List[str] = attr.Factory(list)
+    words: typing.List[str] = field(default_factory=list)
 
     # Hermes siteId/sessionId
     siteId: str = "default"
@@ -29,24 +28,26 @@ class G2pPronounce(Message):
         return "rhasspy/g2p/pronounce"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class G2pPronunciation:
     """Phonetic pronunciation for a single word (in G2pPhonemes)."""
 
     # Phonetic pronunciation for word
-    phonemes: typing.List[str] = attr.Factory(list)
+    phonemes: typing.List[str] = field(default_factory=list)
 
     # True if this pronunciation was guessed using a g2p model.
     # False if it came from a pronunciation dictionary.
     guessed: bool = False
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class G2pPhonemes(Message):
     """Response to G2pPronunciation."""
 
     # Guessed or looked up pronunciations
-    wordPhonemes: typing.Dict[str, typing.List[G2pPronunciation]] = attr.Factory(dict)
+    wordPhonemes: typing.Dict[str, typing.List[G2pPronunciation]] = field(
+        default_factory=dict
+    )
 
     # User id from request
     id: str = ""
@@ -74,7 +75,7 @@ class G2pPhonemes(Message):
         return message
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class G2pError(Message):
     """Error from G2P component."""
 

@@ -1,14 +1,13 @@
 """Messages for hermes/nlu"""
 import re
 import typing
-
-import attr
+from dataclasses import dataclass, field
 
 from .base import Message
 from .intent import Intent, Slot
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class NluQuery(Message):
     """Send text to the NLU component."""
 
@@ -26,13 +25,13 @@ class NluQuery(Message):
         return "hermes/nlu/query"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class NluIntentParsed(Message):
     """Intent successfully parsed."""
 
     input: str
     intent: Intent
-    slots: typing.List[Slot] = attr.Factory(list)
+    slots: typing.List[Slot] = field(default_factory=list)
     id: str = ""
     siteId: str = "default"
     sessionId: str = ""
@@ -43,7 +42,7 @@ class NluIntentParsed(Message):
         return f"hermes/nlu/intentParsed"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class NluIntent(Message):
     """Intent recognized."""
 
@@ -51,17 +50,17 @@ class NluIntent(Message):
 
     input: str
     intent: Intent
-    slots: typing.List[Slot] = attr.Factory(list)
+    slots: typing.List[Slot] = field(default_factory=list)
     id: str = ""
     siteId: str = "default"
     sessionId: str = ""
     customData: str = ""
-    asrTokens: typing.List[str] = attr.Factory(list)
+    asrTokens: typing.List[str] = field(default_factory=list)
     asrConfidence: float = 1.0
 
     # Rhasspy only
     wakewordId: str = ""
-    rawAsrTokens: typing.List[str] = attr.Factory(list)
+    rawAsrTokens: typing.List[str] = field(default_factory=list)
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -133,7 +132,7 @@ class NluIntent(Message):
         }
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class NluIntentNotRecognized(Message):
     """Intent not recognized."""
 
@@ -158,7 +157,7 @@ class NluIntentNotRecognized(Message):
         }
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class NluError(Message):
     """Error from NLU component."""
 
@@ -177,14 +176,14 @@ class NluError(Message):
 # ----------------------------------------------------------------------------
 
 
-@attr.s
+@dataclass
 class NluTrain(Message):
     """Request to retrain from sentences"""
 
     TOPIC_PATTERN = re.compile(r"^rhasspy/nlu/([^/]+)/train$")
 
-    id: str = attr.ib()
-    graph_path: str = attr.ib()
+    id: str
+    graph_path: str
     graph_format: str = "pickle-gzip"
 
     @classmethod
@@ -210,13 +209,13 @@ class NluTrain(Message):
         return match.group(1)
 
 
-@attr.s
+@dataclass
 class NluTrainSuccess(Message):
     """Result from successful training"""
 
     TOPIC_PATTERN = re.compile(r"^rhasspy/nlu/([^/]+)/trainSuccess$")
 
-    id: str = attr.ib()
+    id: str
 
     @classmethod
     def is_site_in_topic(cls) -> bool:

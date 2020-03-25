@@ -1,5 +1,6 @@
 """Command-line interface to rhasspyhermes"""
 import argparse
+import dataclasses
 import io
 import json
 import logging
@@ -9,7 +10,6 @@ import threading
 from pathlib import Path
 from uuid import uuid4
 
-import attr
 import paho.mqtt.client as mqtt
 
 from .base import Message
@@ -179,7 +179,7 @@ def publish(client, message: Message, **topic_args):
     try:
         _LOGGER.debug("-> %s", message)
         topic = message.topic(**topic_args)
-        payload = json.dumps(attr.asdict(message))
+        payload = json.dumps(dataclasses.asdict(message))
         _LOGGER.debug("Publishing %s char(s) to %s", len(payload), topic)
         client.publish(topic, payload)
     except Exception:
@@ -200,7 +200,7 @@ def print_json(args, topic: str, message: Message):
     if args.print_topics:
         print(topic, end=" ")
 
-    json.dump(attr.asdict(message), sys.stdout)
+    json.dump(dataclasses.asdict(message), sys.stdout)
     print("")
     sys.stdout.flush()
 

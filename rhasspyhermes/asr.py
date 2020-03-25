@@ -1,13 +1,12 @@
 """Messages for hermes/asr"""
 import re
 import typing
-
-import attr
+from dataclasses import dataclass
 
 from .base import Message
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrToggleOn(Message):
     """Activate the ASR component."""
 
@@ -18,7 +17,7 @@ class AsrToggleOn(Message):
         return "hermes/asr/toggleOn"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrToggleOff(Message):
     """Deactivate the ASR component."""
 
@@ -29,7 +28,7 @@ class AsrToggleOff(Message):
         return "hermes/asr/toggleOff"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrStartListening(Message):
     """Tell the ASR component to start listening."""
 
@@ -46,7 +45,7 @@ class AsrStartListening(Message):
         return "hermes/asr/startListening"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrStopListening(Message):
     """Tell the ASR component to stop listening."""
 
@@ -58,7 +57,7 @@ class AsrStopListening(Message):
         return "hermes/asr/stopListening"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrTextCaptured(Message):
     """Full ASR transcription results."""
 
@@ -82,7 +81,7 @@ class AsrTextCaptured(Message):
 # ----------------------------------------------------------------------------
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrError(Message):
     """Error from ASR component."""
 
@@ -97,14 +96,14 @@ class AsrError(Message):
         return "hermes/error/asr"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrTrain(Message):
     """Request to retrain from intent graph"""
 
     TOPIC_PATTERN = re.compile(r"^rhasspy/asr/([^/]+)/train$")
 
     id: str
-    graph_path: str = attr.ib()
+    graph_path: str
     graph_format: str = "pickle-gzip"
 
     @classmethod
@@ -130,7 +129,7 @@ class AsrTrain(Message):
         return match.group(1)
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrTrainSuccess(Message):
     """Result from successful training"""
 
@@ -161,7 +160,7 @@ class AsrTrainSuccess(Message):
         return match.group(1)
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class AsrAudioCaptured(Message):
     """Audio captured from ASR session."""
 

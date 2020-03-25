@@ -1,12 +1,11 @@
 """Shared intent/slot classes"""
 import typing
-
-import attr
+from dataclasses import dataclass
 
 from . import utils
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class Intent:
     """Intent name and confidence."""
 
@@ -14,7 +13,7 @@ class Intent:
     confidenceScore: float
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class SlotRange:
     """Index range of a slot in text."""
 
@@ -24,7 +23,7 @@ class SlotRange:
     raw_end: typing.Optional[int] = None
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class Slot:
     """Named entity in an intent."""
 

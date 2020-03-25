@@ -1,14 +1,12 @@
 """Support for Snips Hermes protocol."""
+import dataclasses
 import json
 import typing
-from abc import ABC, abstractmethod
-
-import attr
 
 from . import utils
 
 
-class Message(ABC):
+class Message:
     """Base class for Hermes messages."""
 
     def __init__(self, **kwargs):
@@ -16,10 +14,10 @@ class Message(ABC):
 
     def payload(self) -> typing.Union[str, bytes]:
         """Get binary/string for this message."""
-        try:
-            return json.dumps(attr.asdict(self))
-        except attr.exceptions.NotAnAttrsClassError:
-            return json.dumps(self.__dict__)
+        if dataclasses.is_dataclass(self):
+            return json.dumps(dataclasses.asdict(self))
+
+        return json.dumps(self.__dict__)
 
     @classmethod
     def is_binary_payload(cls) -> bool:
@@ -37,7 +35,6 @@ class Message(ABC):
         return False
 
     @classmethod
-    @abstractmethod
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
 

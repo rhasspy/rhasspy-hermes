@@ -1,10 +1,10 @@
 """Messages for rhasspy/handle"""
-import attr
+from dataclasses import dataclass
 
 from .base import Message
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class HandleToggleOn(Message):
     """Enable intent handling."""
 
@@ -15,7 +15,7 @@ class HandleToggleOn(Message):
         return "rhasspy/handle/toggleOn"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class HandleToggleOff(Message):
     """Disable intent handling."""
 

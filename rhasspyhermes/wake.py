@@ -1,13 +1,12 @@
 """Messages for hermes/hotword"""
 import re
 import typing
-
-import attr
+from dataclasses import dataclass
 
 from .base import Message
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class HotwordToggleOn(Message):
     """Activate the wake word component."""
 
@@ -18,7 +17,7 @@ class HotwordToggleOn(Message):
         return "hermes/hotword/toggleOn"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class HotwordToggleOff(Message):
     """Deactivate the wake word component."""
 
@@ -29,7 +28,7 @@ class HotwordToggleOff(Message):
         return "hermes/hotword/toggleOff"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class HotwordDetected(Message):
     """Wake word component has detected a specific wake word."""
 
@@ -69,7 +68,7 @@ class HotwordDetected(Message):
 # -----------------------------------------------------------------------------
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class HotwordError(Message):
     """Error from Hotword component."""
 
@@ -83,7 +82,7 @@ class HotwordError(Message):
         return "hermes/error/hotword"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class GetHotwords(Message):
     """Request to list available hotwords."""
 
@@ -96,7 +95,7 @@ class GetHotwords(Message):
         return "rhasspy/hotword/getHotwords"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class Hotword:
     """Description of a single hotword (used in hotwords message)."""
 
@@ -110,11 +109,11 @@ class Hotword:
     modelType: str = "personal"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class Hotwords(Message):
     """Response to getHotwords."""
 
-    models: typing.Dict[str, Hotword] = {}
+    models: typing.Dict[str, Hotword] = field(default_factory=dict)
     id: str = ""
     siteId: str = "default"
 

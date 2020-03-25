@@ -1,12 +1,11 @@
 """Messages for hermes/tts"""
 import typing
-
-import attr
+from dataclasses import dataclass, field
 
 from .base import Message
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class TtsSay(Message):
     """Send text to be spoken by the text to speech component."""
 
@@ -21,7 +20,7 @@ class TtsSay(Message):
         return "hermes/tts/say"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class TtsSayFinished(Message):
     """Sent when text to speech component has finished speaking some text."""
 
@@ -38,7 +37,7 @@ class TtsSayFinished(Message):
 # -----------------------------------------------------------------------------
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class GetVoices(Message):
     """Get available voices for text to speech system."""
 
@@ -50,7 +49,7 @@ class GetVoices(Message):
         return "rhasspy/tts/getVoices"
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class Voice:
     """Information about a single TTS voice."""
 
@@ -58,11 +57,11 @@ class Voice:
     description: str = ""
 
 
-@attr.s(auto_attribs=True, slots=True)
+@dataclass
 class Voices(Message):
     """Response to getVoices."""
 
-    voices: typing.Dict[str, Voice] = {}
+    voices: typing.Dict[str, Voice] = field(defaultfactory=dict)
     id: str = ""
     siteId: str = "default"
 
