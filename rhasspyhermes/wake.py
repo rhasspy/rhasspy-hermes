@@ -1,7 +1,7 @@
 """Messages for hermes/hotword"""
 import re
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .base import Message
 

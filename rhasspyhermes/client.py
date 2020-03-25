@@ -7,6 +7,7 @@ import subprocess
 import threading
 import typing
 import wave
+from concurrent.futures import CancelledError
 
 from .audioserver import AudioFrame, AudioSessionFrame, AudioSummary
 from .base import Message
@@ -35,6 +36,7 @@ class HermesClient:
         loop=None,
     ):
         # Internal logger
+        self.client_name = client_name
         self.logger = logging.getLogger(client_name)
 
         # Paho MQTT client
@@ -45,6 +47,7 @@ class HermesClient:
 
         # Set when on_connect succeeds
         self.mqtt_connected_event: asyncio.Event = asyncio.Event()
+        self.mqtt_stopped_event: asyncio.Event = asyncio.Event()
 
         self.is_connected: bool = False
         self.subscribe_lock = threading.Lock()
@@ -121,7 +124,9 @@ class HermesClient:
 
     def stop(self):
         """Stop message handler gracefully."""
-        asyncio.run_coroutine_threadsafe(self.in_queue.put(None), self.loop)
+        if self.loop.is_running():
+            asyncio.run_coroutine_threadsafe(self.in_queue.put(None), self.loop)
+            asyncio.run_coroutine_threadsafe(self.mqtt_stopped_event.wait(), self.loop)
 
     # -------------------------------------------------------------------------
     # MQTT Event Handlers
@@ -166,7 +171,8 @@ class HermesClient:
 
                 # Fire and forget
                 asyncio.ensure_future(
-                    self.on_raw_message(mqtt_message.topic, mqtt_message.payload)
+                    self.on_raw_message(mqtt_message.topic, mqtt_message.payload),
+                    loop=self.loop,
                 )
 
                 # Check against all known message types
@@ -218,15 +224,21 @@ class HermesClient:
                                     sessionId=sessionId,
                                     topic=mqtt_message.topic,
                                 )
-                            )
+                            ),
+                            loop=self.loop,
                         )
 
                         # Assume only one message type will match
                         break
             except KeyboardInterrupt:
                 break
+            except CancelledError:
+                break
             except Exception:
                 self.logger.exception("handle_messages_async")
+                break
+            finally:
+                self.mqtt_stopped_event.set()
 
     # -------------------------------------------------------------------------
     # Publishing Messages

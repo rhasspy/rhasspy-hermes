@@ -61,7 +61,7 @@ class Voice:
 class Voices(Message):
     """Response to getVoices."""
 
-    voices: typing.Dict[str, Voice] = field(defaultfactory=dict)
+    voices: typing.Dict[str, Voice] = field(default_factory=dict)
     id: str = ""
     siteId: str = "default"
 
