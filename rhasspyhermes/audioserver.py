@@ -147,6 +147,10 @@ class AudioPlayFinished(Message):
     sessionId: str = ""
 
     @classmethod
+    def is_site_in_topic(cls) -> bool:
+        return True
+
+    @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
         siteId = kwargs.get("siteId", "+")
