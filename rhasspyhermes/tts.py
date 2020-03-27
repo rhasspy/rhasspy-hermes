@@ -25,6 +25,7 @@ class TtsSayFinished(Message):
     """Sent when text to speech component has finished speaking some text."""
 
     id: str = ""
+    siteId: str = "default"
     sessionId: str = ""
 
     @classmethod
