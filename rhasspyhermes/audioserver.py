@@ -348,3 +348,24 @@ class SummaryToggleOff(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/audioServer/toggleSummaryOff"
+
+@dataclass
+class AudioToggleOn(Message):
+    """Activate audio output system."""
+
+    siteId: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        return "hermes/audioServer/toggleOn"
+
+
+@dataclass
+class AudioToggleOff(Message):
+    """Deactivate audio output system."""
+
+    siteId: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        return "hermes/audioServer/toggleOff"
