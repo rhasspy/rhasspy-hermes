@@ -33,7 +33,6 @@ class HermesClient:
         sample_rate: int = 16000,
         sample_width: int = 2,
         channels: int = 1,
-        loop=None,
     ):
         # Internal logger
         self.client_name = client_name
@@ -47,14 +46,13 @@ class HermesClient:
 
         # Set when on_connect succeeds
         self.mqtt_connected_event: asyncio.Event = asyncio.Event()
-        self.mqtt_stopped_event: asyncio.Event = asyncio.Event()
 
         self.is_connected: bool = False
         self.subscribe_lock = threading.Lock()
         self.pending_mqtt_topics: typing.Set[str] = set()
 
         # Incoming message queue (async)
-        self.in_queue: asyncio.Queue = asyncio.Queue()
+        self.in_queue: typing.Optional[asyncio.Queue] = None
 
         # Message types that are subscribed to
         self.subscribed_types: typing.Set[typing.Type[Message]] = set()
@@ -63,14 +61,12 @@ class HermesClient:
         self.siteIds: typing.Set[str] = set(siteIds) if siteIds else set()
         self.siteId = "default" if not siteIds else siteIds[0]
 
-        # Event loop
-        self.loop = loop or asyncio.get_event_loop()
-        asyncio.run_coroutine_threadsafe(self.handle_messages_async(), self.loop)
-
         # Required audio format
         self.sample_rate = sample_rate
         self.sample_width = sample_width
         self.channels = channels
+
+        self.loop: typing.Optional[asyncio.AbstractEventLoop] = None
 
     # -------------------------------------------------------------------------
     # User Methods
@@ -122,12 +118,6 @@ class HermesClient:
         """Override to handle MQTT messages."""
         pass
 
-    def stop(self):
-        """Stop message handler gracefully."""
-        if self.loop.is_running():
-            asyncio.run_coroutine_threadsafe(self.in_queue.put(None), self.loop)
-            asyncio.run_coroutine_threadsafe(self.mqtt_stopped_event.wait(), self.loop)
-
     # -------------------------------------------------------------------------
     # MQTT Event Handlers
     # -------------------------------------------------------------------------
@@ -138,7 +128,9 @@ class HermesClient:
             self.is_connected = True
             self.logger.debug("Connected to MQTT broker")
             self.subscribe()
-            self.loop.call_soon_threadsafe(self.mqtt_connected_event.set)
+
+            if self.loop:
+                self.loop.call_soon_threadsafe(self.mqtt_connected_event.set)
         except Exception:
             self.logger.exception("on_connect")
 
@@ -146,7 +138,9 @@ class HermesClient:
         """Automatically reconnect when disconnected."""
         try:
             # Automatically reconnect
-            self.loop.call_soon_threadsafe(self.mqtt_connected_event.clear)
+            if self.loop:
+                self.loop.call_soon_threadsafe(self.mqtt_connected_event.clear)
+
             self.is_connected = False
             self.logger.warning("Disconnected. Trying to reconnect...")
             self.mqtt_client.reconnect()
@@ -157,79 +151,59 @@ class HermesClient:
         """Received message from MQTT broker."""
         try:
             # Handle message in event loop
-            asyncio.run_coroutine_threadsafe(self.in_queue.put(msg), self.loop)
+            if self.loop and self.in_queue:
+                asyncio.run_coroutine_threadsafe(self.in_queue.put(msg), self.loop)
         except Exception:
             self.logger.exception("on_message")
 
-    async def handle_messages_async(self):
+    async def handle_messages_async(
+        self, loop: typing.Optional[asyncio.AbstractEventLoop] = None
+    ):
         """Handles MQTT messages in event loop."""
-        while self.loop.is_running():
+        self.loop = loop or self.loop or asyncio.get_running_loop()
+        self.in_queue = asyncio.Queue()
+
+        while True:
             try:
                 mqtt_message = await self.in_queue.get()
                 if mqtt_message is None:
                     break
 
                 # Fire and forget
-                asyncio.ensure_future(
-                    self.on_raw_message(mqtt_message.topic, mqtt_message.payload),
-                    loop=self.loop,
+                asyncio.create_task(
+                    self.on_raw_message(mqtt_message.topic, mqtt_message.payload)
                 )
 
                 # Check against all known message types
-                for message_type in self.subscribed_types:
-                    if message_type.is_topic(mqtt_message.topic):
-                        # Verify siteId and parse
-                        if message_type.is_binary_payload():
-                            # Binary
-                            if message_type.is_site_in_topic():
-                                siteId = message_type.get_siteId(mqtt_message.topic)
-                                if not self.valid_siteId(siteId):
-                                    continue
+                for message, siteId, sessionId in HermesClient.parse_mqtt_message(
+                    mqtt_message.topic, mqtt_message.payload, self.subscribed_types
+                ):
 
-                            # Assume payload is only argument to constructor
-                            message = message_type(mqtt_message.payload)
-                            if not isinstance(message, (AudioFrame, AudioSessionFrame)):
-                                self.logger.debug(
-                                    "<- %s(%s byte(s))",
-                                    message_type.__name__,
-                                    len(mqtt_message.payload),
-                                )
-                        else:
-                            # JSON
-                            json_payload = json.loads(mqtt_message.payload)
-                            if message_type.is_site_in_topic():
-                                siteId = message_type.get_siteId(mqtt_message.topic)
-                            else:
-                                siteId = json_payload.get("siteId", "default")
+                    if not self.valid_siteId(siteId):
+                        continue
 
-                            if not self.valid_siteId(siteId):
-                                continue
+                    # Log messages
+                    if message.is_binary_payload():
+                        if not isinstance(message, (AudioFrame, AudioSessionFrame)):
+                            self.logger.debug(
+                                "<- %s(%s byte(s))",
+                                message.__class__.__name__,
+                                len(mqtt_message.payload),
+                            )
+                    elif not isinstance(message, AudioSummary):
+                        self.logger.debug("<- %s", message)
 
-                            # Load from JSON
-                            message = message_type.from_dict(json_payload)
-
-                            if not isinstance(message, AudioSummary):
-                                self.logger.debug("<- %s", message)
-
-                        sessionId = None
-                        if message_type.is_session_in_topic():
-                            sessionId = message_type.get_sessionId(mqtt_message.topic)
-
-                        # Publish all responses
-                        asyncio.ensure_future(
-                            self.publish_all(
-                                self.on_message(
-                                    message,
-                                    siteId=siteId,
-                                    sessionId=sessionId,
-                                    topic=mqtt_message.topic,
-                                )
-                            ),
-                            loop=self.loop,
+                    # Publish all responses
+                    asyncio.create_task(
+                        self.publish_all(
+                            self.on_message(
+                                message,
+                                siteId=siteId,
+                                sessionId=sessionId,
+                                topic=mqtt_message.topic,
+                            )
                         )
-
-                        # Assume only one message type will match
-                        break
+                    )
             except KeyboardInterrupt:
                 break
             except CancelledError:
@@ -237,8 +211,49 @@ class HermesClient:
             except Exception:
                 self.logger.exception("handle_messages_async")
                 break
-            finally:
-                self.mqtt_stopped_event.set()
+
+    @classmethod
+    def parse_mqtt_message(
+        cls,
+        topic: str,
+        payload: typing.Union[str, bytes],
+        subscribed_types: typing.Iterable[typing.Type[Message]],
+    ) -> typing.Iterable[
+        typing.Tuple[Message, typing.Optional[str], typing.Optional[str]]
+    ]:
+        """Deserialize MQTT message into Hermes object."""
+        # Check against all known message types
+        for message_type in subscribed_types:
+            if message_type.is_topic(topic):
+                siteId: typing.Optional[str] = None
+
+                # Verify siteId and parse
+                if message_type.is_binary_payload():
+                    # Binary
+                    if message_type.is_site_in_topic():
+                        siteId = message_type.get_siteId(topic)
+
+                    # Assume payload is only argument to constructor
+                    message = message_type(payload)  # type: ignore
+                else:
+                    # JSON
+                    json_payload = json.loads(payload)
+                    if message_type.is_site_in_topic():
+                        siteId = message_type.get_siteId(topic)
+                    else:
+                        siteId = json_payload.get("siteId", "default")
+
+                    # Load from JSON
+                    message = message_type.from_dict(json_payload)
+
+                sessionId: typing.Optional[str] = None
+                if message_type.is_session_in_topic():
+                    sessionId = message_type.get_sessionId(topic)
+
+                yield (message, siteId, sessionId)
+
+                # Assume only one message type will match
+                break
 
     # -------------------------------------------------------------------------
     # Publishing Messages
@@ -284,9 +299,9 @@ class HermesClient:
     # Utility Methods
     # -------------------------------------------------------------------------
 
-    def valid_siteId(self, siteId: str):
+    def valid_siteId(self, siteId: typing.Optional[str]):
         """True if siteId is valid for this client."""
-        if self.siteIds:
+        if siteId and self.siteIds:
             return siteId in self.siteIds
 
         return True

@@ -202,7 +202,7 @@ class NluTrain(Message):
         return re.match(NluTrain.TOPIC_PATTERN, topic) is not None
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(NluTrain.TOPIC_PATTERN, topic)
         assert match, "Not a train topic"
@@ -233,7 +233,7 @@ class NluTrainSuccess(Message):
         return re.match(NluTrainSuccess.TOPIC_PATTERN, topic) is not None
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(NluTrainSuccess.TOPIC_PATTERN, topic)
         assert match, "Not a trainSuccess topic"

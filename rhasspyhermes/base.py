@@ -20,6 +20,16 @@ class Message:
         return json.dumps(self.__dict__)
 
     @classmethod
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
+        """Extract siteId from message topic."""
+        return None
+
+    @classmethod
+    def get_sessionId(cls, topic: str) -> typing.Optional[str]:
+        """Extract sessionId from message topic."""
+        return None
+
+    @classmethod
     def is_binary_payload(cls) -> bool:
         """True if message payload is not JSON."""
         return False

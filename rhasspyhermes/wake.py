@@ -2,8 +2,17 @@
 import re
 import typing
 from dataclasses import dataclass, field
+from enum import Enum
 
 from .base import Message
+
+
+class HotwordToggleReason(str, Enum):
+    """Reason for hotword toggle on/off."""
+
+    UNKNOWN = ""
+    DIALOGUE_SESSION = "dialogueSession"
+    PLAY_AUDIO = "playAudio"
 
 
 @dataclass
@@ -13,7 +22,7 @@ class HotwordToggleOn(Message):
     siteId: str = "default"
 
     # Rhasspy only
-    reason: str = ""
+    reason: HotwordToggleReason = HotwordToggleReason.UNKNOWN
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -27,7 +36,7 @@ class HotwordToggleOff(Message):
     siteId: str = "default"
 
     # Rhasspy only
-    reason: str = ""
+    reason: HotwordToggleReason = HotwordToggleReason.UNKNOWN
 
     @classmethod
     def topic(cls, **kwargs) -> str:

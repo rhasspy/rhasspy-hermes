@@ -38,7 +38,7 @@ class AudioFrame(Message):
         return f"hermes/audioServer/{siteId}/audioFrame"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AudioFrame.TOPIC_PATTERN, topic)
         assert match, "Not an audioFrame topic"
@@ -118,7 +118,7 @@ class AudioPlayBytes(Message):
         return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AudioPlayBytes.TOPIC_PATTERN, topic)
         assert match, "Not a playBytes topic"
@@ -157,7 +157,7 @@ class AudioPlayFinished(Message):
         return f"hermes/audioServer/{siteId}/playFinished"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AudioPlayFinished.TOPIC_PATTERN, topic)
         assert match, "Not a playFinished topic"
@@ -267,14 +267,14 @@ class AudioSessionFrame(Message):
         return f"hermes/audioServer/{siteId}/{sessionId}/audioSessionFrame"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AudioSessionFrame.TOPIC_PATTERN, topic)
         assert match, "Not an audioSessionFrame topic"
         return match.group(1)
 
     @classmethod
-    def get_sessionId(cls, topic: str) -> str:
+    def get_sessionId(cls, topic: str) -> typing.Optional[str]:
         """Get sessionId from a topic"""
         match = re.match(AudioSessionFrame.TOPIC_PATTERN, topic)
         assert match, "Not an audioSessionFrame topic"
@@ -320,7 +320,7 @@ class AudioSummary(Message):
         return f"hermes/audioServer/{siteId}/audioSummary"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AudioSummary.TOPIC_PATTERN, topic)
         assert match, "Not an audioSummary topic"
@@ -352,6 +352,7 @@ class SummaryToggleOff(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/audioServer/toggleSummaryOff"
+
 
 @dataclass
 class AudioToggleOn(Message):

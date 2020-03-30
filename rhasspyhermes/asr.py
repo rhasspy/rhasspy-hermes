@@ -2,8 +2,17 @@
 import re
 import typing
 from dataclasses import dataclass
+from enum import Enum
 
 from .base import Message
+
+
+class AsrToggleReason(str, Enum):
+    """Reason for ASR toggle on/off."""
+
+    UNKNOWN = ""
+    DIALOGUE_SESSION = "dialogueSession"
+    PLAY_AUDIO = "playAudio"
 
 
 @dataclass
@@ -13,7 +22,7 @@ class AsrToggleOn(Message):
     siteId: str = "default"
 
     # Rhasspy only
-    reason: str = ""
+    reason: AsrToggleReason = AsrToggleReason.UNKNOWN
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -27,7 +36,7 @@ class AsrToggleOff(Message):
     siteId: str = "default"
 
     # Rhasspy only
-    reason: str = ""
+    reason: AsrToggleReason = AsrToggleReason.UNKNOWN
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -128,7 +137,7 @@ class AsrTrain(Message):
         return re.match(AsrTrain.TOPIC_PATTERN, topic) is not None
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AsrTrain.TOPIC_PATTERN, topic)
         assert match, "Not a train topic"
@@ -159,7 +168,7 @@ class AsrTrainSuccess(Message):
         return re.match(AsrTrainSuccess.TOPIC_PATTERN, topic) is not None
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AsrTrainSuccess.TOPIC_PATTERN, topic)
         assert match, "Not a trainSuccess topic"
@@ -202,14 +211,14 @@ class AsrAudioCaptured(Message):
         return re.match(AsrAudioCaptured.TOPIC_PATTERN, topic) is not None
 
     @classmethod
-    def get_siteId(cls, topic: str) -> str:
+    def get_siteId(cls, topic: str) -> typing.Optional[str]:
         """Get siteId from a topic"""
         match = re.match(AsrAudioCaptured.TOPIC_PATTERN, topic)
         assert match, "Not an audioCaptured topic"
         return match.group(1)
 
     @classmethod
-    def get_sessionId(cls, topic: str) -> str:
+    def get_sessionId(cls, topic: str) -> typing.Optional[str]:
         """Get sessionId from a topic"""
         match = re.match(AsrAudioCaptured.TOPIC_PATTERN, topic)
         assert match, "Not an audioCaptured topic"
