@@ -12,6 +12,9 @@ class AsrToggleOn(Message):
 
     siteId: str = "default"
 
+    # Rhasspy only
+    reason: str = ""
+
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/asr/toggleOn"
@@ -22,6 +25,9 @@ class AsrToggleOff(Message):
     """Deactivate the ASR component."""
 
     siteId: str = "default"
+
+    # Rhasspy only
+    reason: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:

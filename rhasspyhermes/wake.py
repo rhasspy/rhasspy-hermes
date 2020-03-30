@@ -12,6 +12,9 @@ class HotwordToggleOn(Message):
 
     siteId: str = "default"
 
+    # Rhasspy only
+    reason: str = ""
+
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/hotword/toggleOn"
@@ -22,6 +25,9 @@ class HotwordToggleOff(Message):
     """Deactivate the wake word component."""
 
     siteId: str = "default"
+
+    # Rhasspy only
+    reason: str = ""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
