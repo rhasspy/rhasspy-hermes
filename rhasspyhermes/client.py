@@ -3,6 +3,7 @@ import asyncio
 import io
 import json
 import logging
+import queue
 import subprocess
 import threading
 import typing
@@ -33,6 +34,7 @@ class HermesClient:
         sample_rate: int = 16000,
         sample_width: int = 2,
         channels: int = 1,
+        loop: typing.Optional[asyncio.AbstractEventLoop] = None,
     ):
         # Internal logger
         self.client_name = client_name
@@ -53,6 +55,7 @@ class HermesClient:
 
         # Incoming message queue (async)
         self.in_queue: typing.Optional[asyncio.Queue] = None
+        self.pre_queue = queue.Queue()
 
         # Message types that are subscribed to
         self.subscribed_types: typing.Set[typing.Type[Message]] = set()
@@ -66,7 +69,7 @@ class HermesClient:
         self.sample_width = sample_width
         self.channels = channels
 
-        self.loop: typing.Optional[asyncio.AbstractEventLoop] = None
+        self.loop: typing.Optional[asyncio.AbstractEventLoop] = loop
 
     # -------------------------------------------------------------------------
     # User Methods
@@ -112,6 +115,7 @@ class HermesClient:
         topic: typing.Optional[str] = None,
     ) -> GeneratorType:
         """Override to handle Hermes messages."""
+        self.logger.warning("Using default message handler.")
         yield None
 
     async def on_raw_message(self, topic: str, payload: bytes):
@@ -153,6 +157,9 @@ class HermesClient:
             # Handle message in event loop
             if self.loop and self.in_queue:
                 asyncio.run_coroutine_threadsafe(self.in_queue.put(msg), self.loop)
+            else:
+                # Save in pre-queue to be picked up later
+                self.pre_queue.put(msg)
         except Exception:
             self.logger.exception("on_message")
 
@@ -163,6 +170,11 @@ class HermesClient:
         self.loop = loop or self.loop or asyncio.get_running_loop()
         self.in_queue = asyncio.Queue()
 
+        # Pull in messages from pre-queue
+        while self.pre_queue.qsize() > 0:
+            self.in_queue.put_nowait(self.pre_queue.get_nowait())
+
+        # Main loop
         while True:
             try:
                 mqtt_message = await self.in_queue.get()
