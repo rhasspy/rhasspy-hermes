@@ -156,7 +156,7 @@ class HermesClient:
         try:
             # Handle message in event loop
             if self.loop and self.in_queue:
-                asyncio.run_coroutine_threadsafe(self.in_queue.put(msg), self.loop)
+                self.loop.call_soon_threadsafe(self.in_queue.put_nowait, msg)
             else:
                 # Save in pre-queue to be picked up later
                 self.pre_queue.put(msg)
