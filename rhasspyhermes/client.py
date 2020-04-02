@@ -55,7 +55,7 @@ class HermesClient:
 
         # Incoming message queue (async)
         self.in_queue: typing.Optional[asyncio.Queue] = None
-        self.pre_queue = queue.Queue()
+        self.pre_queue: queue.Queue = queue.Queue()
 
         # Message types that are subscribed to
         self.subscribed_types: typing.Set[typing.Type[Message]] = set()
