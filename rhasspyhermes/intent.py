@@ -29,9 +29,9 @@ class Slot:
 
     entity: str
     slotName: str
-    confidence: float
     raw_value: str
     value: str
+    confidence: float = 0.0
     range: typing.Optional[SlotRange] = None
 
     @property
@@ -78,7 +78,14 @@ class Slot:
     def from_dict(cls, object_dict: typing.Dict[str, typing.Any]):
         """Parse into Slot object from dictionary."""
         object_dict = utils.only_fields(cls, object_dict)
-        slot_range = object_dict.pop("range")
+
+        if "slotName" not in object_dict:
+            object_dict["slotName"] = object_dict.get("entity")
+
+        if "raw_value" not in object_dict:
+            object_dict["raw_value"] = object_dict.get("value")
+
+        slot_range = object_dict.pop("range", None)
         slot = Slot(**object_dict)
         if slot_range:
             slot.range = SlotRange(**slot_range)

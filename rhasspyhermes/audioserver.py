@@ -374,3 +374,31 @@ class AudioToggleOff(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/audioServer/toggleOff"
+
+@dataclass
+class AudioRecordError(Message):
+    """Error from audio input component."""
+
+    error: str
+    context: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        return "hermes/error/audioServer/record"
+
+@dataclass
+class AudioPlayError(Message):
+    """Error from audio output component."""
+
+    error: str
+    context: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        return "hermes/error/audioServer/play"

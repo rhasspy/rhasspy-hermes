@@ -69,3 +69,18 @@ class Voices(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "rhasspy/tts/voices"
+
+
+@dataclass
+class TtsError(Message):
+    """Error from TTS component."""
+
+    error: str
+    context: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        return "hermes/error/tts"
