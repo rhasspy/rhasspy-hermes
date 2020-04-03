@@ -12,10 +12,14 @@ class Message:
     def __init__(self, **kwargs):
         pass
 
+    def asdict(self) -> typing.Dict[str, typing.Any]:
+        """Convert message to dict."""
+        return dataclasses.asdict(self)
+
     def payload(self) -> typing.Union[str, bytes]:
         """Get binary/string for this message."""
         if dataclasses.is_dataclass(self):
-            return json.dumps(dataclasses.asdict(self))
+            return json.dumps(self.asdict())
 
         return json.dumps(self.__dict__)
 

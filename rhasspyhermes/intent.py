@@ -28,11 +28,19 @@ class Slot:
     """Named entity in an intent."""
 
     entity: str
-    slotName: str
-    raw_value: str
     value: str
+    slotName: str = None  # type: ignore
+    raw_value: str = None  # type: ignore
     confidence: float = 0.0
     range: typing.Optional[SlotRange] = None
+
+    def __post_init__(self):
+        """dataclasses post-init"""
+        if self.slotName is None:
+            self.slotName = self.entity
+
+        if self.raw_value is None:
+            self.raw_value = self.value
 
     @property
     def start(self) -> int:
@@ -60,7 +68,7 @@ class Slot:
         if self.range:
             return self.range.end
 
-        return -1
+        return 1
 
     @property
     def raw_end(self) -> int:

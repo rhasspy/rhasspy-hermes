@@ -129,6 +129,7 @@ class DialogueEndSession(Message):
     """Sent when a dialogue session should be ended."""
 
     sessionId: str = ""
+    text: str = ""
     customData: str = ""
 
     @classmethod
@@ -162,3 +163,23 @@ class DialogueIntentNotRecognized(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/dialogueManager/intentNotRecognized"
+
+
+# ----------------------------------------------------------------------------
+# Rhasspy-specific Messages
+# ----------------------------------------------------------------------------
+
+
+@dataclass
+class DialogueError(Message):
+    """Error from dialogue manager component."""
+
+    error: str
+    context: str = ""
+    siteId: str = "default"
+    sessionId: str = ""
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        return "hermes/error/dialogueManager"
