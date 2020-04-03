@@ -9,6 +9,7 @@ import threading
 import typing
 import wave
 from concurrent.futures import CancelledError
+from pathlib import Path
 
 from .audioserver import AudioFrame, AudioSessionFrame, AudioSummary
 from .base import Message
@@ -435,3 +436,33 @@ class HermesClient:
                 wav_file.writeframes(audio_data)
 
             return wav_buffer.getvalue()
+
+    def reduce_noise(
+        self, audio_data: bytes, noise_profile: Path, amount: float = 0.5
+    ) -> bytes:
+        """Reduce noise in raw audio using sox noise profile."""
+        return subprocess.run(
+            [
+                "sox",
+                "-r",
+                str(self.sample_rate),
+                "-e",
+                "signed-integer",
+                "-b",
+                str(self.sample_width * 8),
+                "-c",
+                str(self.channels),
+                "-t",
+                "raw",
+                "-",
+                "-t",
+                "raw",
+                "-",
+                "noisered",
+                str(noise_profile),
+                str(amount),
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            input=audio_data,
+        ).stdout
