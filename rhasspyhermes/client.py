@@ -59,6 +59,10 @@ class HermesClient:
 
         # Message types that are subscribed to
         self.subscribed_types: typing.Set[typing.Type[Message]] = set()
+        self.subscribed_topics: typing.Set[str] = set()
+
+        # Cache of all MQTT topics in case we get disconnected
+        self.all_mqtt_topics: typing.Set[str] = set()
 
         # Set of valid siteIds (empty for all)
         self.siteIds: typing.Set[str] = set(siteIds) if siteIds else set()
@@ -102,8 +106,13 @@ class HermesClient:
             if self.is_connected:
                 # Subscribe to all pending topics
                 for topic in self.pending_mqtt_topics:
-                    self.mqtt_client.subscribe(topic)
-                    self.logger.debug("Subscribed to %s", topic)
+                    self.all_mqtt_topics.add(topic)
+
+                    # Don't re-subscribe
+                    if topic not in self.subscribed_topics:
+                        self.mqtt_client.subscribe(topic)
+                        self.subscribed_topics.add(topic)
+                        self.logger.debug("Subscribed to %s", topic)
 
                 self.pending_mqtt_topics.clear()
 
@@ -147,6 +156,13 @@ class HermesClient:
 
             self.is_connected = False
             self.logger.warning("Disconnected. Trying to reconnect...")
+
+            # Clear topic cache
+            self.subscribed_topics.clear()
+
+            # Will re-subscribe to everything when connected
+            self.pending_mqtt_topics.update(self.all_mqtt_topics)
+
             self.mqtt_client.reconnect()
         except Exception:
             self.logger.exception("on_disconnect")
