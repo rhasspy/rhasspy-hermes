@@ -19,9 +19,9 @@ class Message:
     def payload(self) -> typing.Union[str, bytes]:
         """Get binary/string for this message."""
         if dataclasses.is_dataclass(self):
-            return json.dumps(self.asdict())
+            return json.dumps(self.asdict(), default=str)
 
-        return json.dumps(self.__dict__)
+        return json.dumps(self.__dict__, default=str)
 
     @classmethod
     def get_siteId(cls, topic: str) -> typing.Optional[str]:

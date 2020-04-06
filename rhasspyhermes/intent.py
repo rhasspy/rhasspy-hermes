@@ -19,8 +19,8 @@ class SlotRange:
 
     start: int
     end: int
-    raw_start: typing.Optional[int] = None
-    raw_end: typing.Optional[int] = None
+    rawStart: typing.Optional[int] = None
+    rawEnd: typing.Optional[int] = None
 
 
 @dataclass
@@ -28,9 +28,9 @@ class Slot:
     """Named entity in an intent."""
 
     entity: str
-    value: str
+    value: typing.Dict[str, typing.Any]
     slotName: str = None  # type: ignore
-    raw_value: str = None  # type: ignore
+    rawValue: str = None  # type: ignore
     confidence: float = 0.0
     range: typing.Optional[SlotRange] = None
 
@@ -39,8 +39,8 @@ class Slot:
         if self.slotName is None:
             self.slotName = self.entity
 
-        if self.raw_value is None:
-            self.raw_value = self.value
+        if self.rawValue is None:
+            self.rawValue = self.value.get("value")
 
     @property
     def start(self) -> int:
@@ -51,11 +51,11 @@ class Slot:
         return 0
 
     @property
-    def raw_start(self) -> int:
+    def rawStart(self) -> int:
         """Get start index of raw slot value"""
         value = None
         if self.range:
-            value = self.range.raw_start
+            value = self.range.rawStart
 
         if value is None:
             return self.start
@@ -71,11 +71,11 @@ class Slot:
         return 1
 
     @property
-    def raw_end(self) -> int:
+    def rawEnd(self) -> int:
         """Get end index (exclusive) of raw slot value"""
         value = None
         if self.range:
-            value = self.range.raw_end
+            value = self.range.rawEnd
 
         if value is None:
             return self.end
@@ -90,8 +90,8 @@ class Slot:
         if "slotName" not in object_dict:
             object_dict["slotName"] = object_dict.get("entity")
 
-        if "raw_value" not in object_dict:
-            object_dict["raw_value"] = object_dict.get("value")
+        if "rawValue" not in object_dict:
+            object_dict["rawValue"] = object_dict.get("value")
 
         slot_range = object_dict.pop("range", None)
         slot = Slot(**object_dict)

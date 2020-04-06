@@ -114,16 +114,19 @@ class NluIntent(Message):
             "entities": [
                 {
                     "entity": s.slotName,
-                    "value": s.value,
-                    "raw_value": s.raw_value,
+                    "value": s.value.get("value"),
+                    "raw_value": s.rawValue,
                     "start": s.start,
                     "end": s.end,
-                    "raw_start": (s.raw_start if s.raw_start is not None else s.start),
-                    "raw_end": (s.raw_end if s.raw_end is not None else s.end),
+                    "raw_start": (s.rawStart if s.rawStart is not None else s.start),
+                    "raw_end": (s.rawEnd if s.rawEnd is not None else s.end),
+                    "source": s.entity,
+                    "kind": s.value.get("kind", ""),
+                    "unit": s.value.get("unit", ""),
                 }
                 for s in self.slots
             ],
-            "slots": {s.slotName: s.value for s in self.slots},
+            "slots": {s.slotName: s.value.get("value") for s in self.slots},
             "text": self.input,
             "raw_text": self.raw_input,
             "tokens": self.asrTokens,
