@@ -86,15 +86,19 @@ class Slot:
     def from_dict(cls, object_dict: typing.Dict[str, typing.Any]):
         """Parse into Slot object from dictionary."""
         object_dict = utils.only_fields(cls, object_dict)
+        value = object_dict.pop("value", None)
+
+        if not value:
+            value = {"value": ""}
 
         if "slotName" not in object_dict:
             object_dict["slotName"] = object_dict.get("entity")
 
         if "rawValue" not in object_dict:
-            object_dict["rawValue"] = object_dict.get("value")
+            object_dict["rawValue"] = value
 
         slot_range = object_dict.pop("range", None)
-        slot = Slot(**object_dict)
+        slot = Slot(value=value, **object_dict)
         if slot_range:
             slot.range = SlotRange(**slot_range)
 
