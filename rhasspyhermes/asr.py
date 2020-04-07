@@ -13,6 +13,7 @@ class AsrToggleReason(str, Enum):
     UNKNOWN = ""
     DIALOGUE_SESSION = "dialogueSession"
     PLAY_AUDIO = "playAudio"
+    TTS_SAY = "ttsSay"
 
 
 @dataclass

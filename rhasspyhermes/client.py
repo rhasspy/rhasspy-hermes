@@ -141,6 +141,14 @@ class HermesClient:
         try:
             self.is_connected = True
             self.logger.debug("Connected to MQTT broker")
+
+            # Clear topic cache
+            self.subscribed_topics.clear()
+
+            # Re-subscribe to everything if previous disconnected
+            self.pending_mqtt_topics.update(self.all_mqtt_topics)
+
+            # Handle subscriptions
             self.subscribe()
 
             if self.loop:
@@ -151,18 +159,13 @@ class HermesClient:
     def mqtt_on_disconnect(self, client, userdata, flags, rc):
         """Automatically reconnect when disconnected."""
         try:
+            self.logger.warning("Disconnected. Trying to reconnect...")
+
             # Automatically reconnect
             if self.loop:
                 self.loop.call_soon_threadsafe(self.mqtt_connected_event.clear)
 
             self.is_connected = False
-            self.logger.warning("Disconnected. Trying to reconnect...")
-
-            # Clear topic cache
-            self.subscribed_topics.clear()
-
-            # Will re-subscribe to everything when connected
-            self.pending_mqtt_topics.update(self.all_mqtt_topics)
 
             self.mqtt_client.reconnect()
         except Exception:
@@ -251,38 +254,41 @@ class HermesClient:
         typing.Tuple[Message, typing.Optional[str], typing.Optional[str]]
     ]:
         """Deserialize MQTT message into Hermes object."""
-        # Check against all known message types
-        for message_type in subscribed_types:
-            if message_type.is_topic(topic):
-                siteId: typing.Optional[str] = None
+        try:
+            # Check against all known message types
+            for message_type in subscribed_types:
+                if message_type.is_topic(topic):
+                    siteId: typing.Optional[str] = None
 
-                # Verify siteId and parse
-                if message_type.is_binary_payload():
-                    # Binary
-                    if message_type.is_site_in_topic():
-                        siteId = message_type.get_siteId(topic)
+                    # Verify siteId and parse
+                    if message_type.is_binary_payload():
+                        # Binary
+                        if message_type.is_site_in_topic():
+                            siteId = message_type.get_siteId(topic)
 
-                    # Assume payload is only argument to constructor
-                    message = message_type(payload)  # type: ignore
-                else:
-                    # JSON
-                    json_payload = json.loads(payload)
-                    if message_type.is_site_in_topic():
-                        siteId = message_type.get_siteId(topic)
+                        # Assume payload is only argument to constructor
+                        message = message_type(payload)  # type: ignore
                     else:
-                        siteId = json_payload.get("siteId", "default")
+                        # JSON
+                        json_payload = json.loads(payload)
+                        if message_type.is_site_in_topic():
+                            siteId = message_type.get_siteId(topic)
+                        else:
+                            siteId = json_payload.get("siteId", "default")
 
-                    # Load from JSON
-                    message = message_type.from_dict(json_payload)
+                        # Load from JSON
+                        message = message_type.from_dict(json_payload)
 
-                sessionId: typing.Optional[str] = None
-                if message_type.is_session_in_topic():
-                    sessionId = message_type.get_sessionId(topic)
+                    sessionId: typing.Optional[str] = None
+                    if message_type.is_session_in_topic():
+                        sessionId = message_type.get_sessionId(topic)
 
-                yield (message, siteId, sessionId)
+                    yield (message, siteId, sessionId)
 
-                # Assume only one message type will match
-                break
+                    # Assume only one message type will match
+                    break
+        except Exception:
+            logging.exception("parse_mqtt_message (topic=%s)", topic)
 
     # -------------------------------------------------------------------------
     # Publishing Messages
