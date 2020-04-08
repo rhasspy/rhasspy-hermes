@@ -66,14 +66,14 @@ def main():
     client.loop_start()
 
     try:
-        siteId = "default"
-        if args.siteId:
-            # Use first siteId
-            siteId = args.siteId[0]
-            args.siteId = set(args.siteId)
+        site_id = "default"
+        if args.site_id:
+            # Use first site_id
+            site_id = args.site_id[0]
+            args.site_id = set(args.site_id)
 
         # Call sub-commmand
-        args.func(args, client, siteId)
+        args.func(args, client, site_id)
     except KeyboardInterrupt:
         pass
     finally:
@@ -93,9 +93,9 @@ def get_args() -> argparse.Namespace:
         "--port", type=int, default=1883, help="MQTT port (default: 1883)"
     )
     parser.add_argument(
-        "--siteId",
+        "--site-id",
         action="append",
-        help="Hermes siteId(s) to listen for (default: all)",
+        help="Hermes site_id(s) to listen for (default: all)",
     )
     parser.add_argument(
         "--print-topics",
@@ -186,11 +186,11 @@ def publish(client, message: Message, **topic_args):
         _LOGGER.exception("on_message")
 
 
-def check_siteId(args, json_payload):
-    """Return True if siteId matches one of configured siteIds"""
-    if args.siteId:
-        siteId = json_payload.get("siteId", "default")
-        return siteId in args.siteId
+def check_site_id(args, json_payload):
+    """Return True if site_id matches one of configured site_ids"""
+    if args.site_id:
+        site_id = json_payload.get("site_id", "default")
+        return site_id in args.site_id
 
     return True
 
@@ -208,13 +208,13 @@ def print_json(args, topic: str, message: Message):
 # -----------------------------------------------------------------------------
 
 
-def transcribe(args, client, siteId):
+def transcribe(args, client, site_id):
     """Transcribe one or more WAV files using hermes/asr"""
     from .asr import AsrStartListening, AsrStopListening, AsrTextCaptured
     from .audioserver import AudioFrame
 
     client.subscribe(AsrTextCaptured.topic())
-    frame_topic = AudioFrame.topic(siteId=siteId)
+    frame_topic = AudioFrame.topic(site_id=site_id)
 
     if args.wav_file:
         # Read WAV paths from command-line arguments
@@ -254,9 +254,9 @@ def transcribe(args, client, siteId):
             nonlocal result_topic, text_captured
             try:
                 if msg.topic == AsrTextCaptured.topic():
-                    # Verify siteId/session_id
+                    # Verify site_id/session_id
                     json_payload = json.loads(msg.payload)
-                    if check_siteId(args, json_payload) and (
+                    if check_site_id(args, json_payload) and (
                         json_payload.get("session_id", "") == session_id
                     ):
                         # Matched
@@ -270,7 +270,7 @@ def transcribe(args, client, siteId):
 
         with wav_file:
             # startListening
-            publish(client, AsrStartListening(siteId=siteId, session_id=session_id))
+            publish(client, AsrStartListening(site_id=site_id, session_id=session_id))
 
             # Send WAV chunks (audioFrame)
             for wav_chunk in AudioFrame.iter_wav_chunked(
@@ -279,7 +279,7 @@ def transcribe(args, client, siteId):
                 client.publish(frame_topic, wav_chunk)
 
             # stopListening
-            publish(client, AsrStopListening(siteId=siteId, session_id=session_id))
+            publish(client, AsrStopListening(site_id=site_id, session_id=session_id))
 
         _LOGGER.debug(
             "Waiting for textCaptured (%s, session_id=%s)", wav_name, session_id
@@ -296,7 +296,7 @@ def transcribe(args, client, siteId):
 # -----------------------------------------------------------------------------
 
 
-def recognize(args, client, siteId):
+def recognize(args, client, site_id):
     """Recognize intent(s) from one or more sentences using hermes/nlu"""
     from .nlu import NluQuery, NluIntent, NluIntentNotRecognized, NluError
 
@@ -329,10 +329,10 @@ def recognize(args, client, siteId):
             nonlocal result_topic, result_message
             try:
                 if NluIntent.is_topic(msg.topic):
-                    # Verify siteId/id/session_id
+                    # Verify site_id/id/session_id
                     json_payload = json.loads(msg.payload)
                     if (
-                        check_siteId(args, json_payload)
+                        check_site_id(args, json_payload)
                         and (json_payload.get("session_id", "") == session_id)
                         and (json_payload.get("id", "") == queryId)
                     ):
@@ -341,10 +341,10 @@ def recognize(args, client, siteId):
                         result_message = NluIntent(**json_payload)
                         done_event.set()
                 elif msg.topic == NluIntentNotRecognized.topic():
-                    # Verify siteId/id/session_id
+                    # Verify site_id/id/session_id
                     json_payload = json.loads(msg.payload)
                     if (
-                        check_siteId(args, json_payload)
+                        check_site_id(args, json_payload)
                         and (json_payload.get("id", "") == queryId)
                         and (json_payload.get("session_id", "") == session_id)
                     ):
@@ -353,9 +353,9 @@ def recognize(args, client, siteId):
                         result_message = NluIntentNotRecognized(**json_payload)
                         done_event.set()
                 elif msg.topic == NluError.topic():
-                    # Verify siteId/session_id
+                    # Verify site_id/session_id
                     json_payload = json.loads(msg.payload)
-                    if check_siteId(args, json_payload) and (
+                    if check_site_id(args, json_payload) and (
                         json_payload.get("session_id", "") == session_id
                     ):
                         # Error
@@ -371,7 +371,9 @@ def recognize(args, client, siteId):
         # Send query
         publish(
             client,
-            NluQuery(input=sentence, siteId=siteId, id=queryId, session_id=session_id),
+            NluQuery(
+                input=sentence, site_id=site_id, id=queryId, session_id=session_id
+            ),
         )
 
         # Wait for response
@@ -386,7 +388,7 @@ def recognize(args, client, siteId):
 # -----------------------------------------------------------------------------
 
 
-def speak(args, client, siteId):
+def speak(args, client, site_id):
     """Speak one or more sentences using hermes/tts"""
     from .tts import TtsSay, TtsSayFinished
 
@@ -417,10 +419,10 @@ def speak(args, client, siteId):
             nonlocal result_topic, result_message
             try:
                 if msg.topic == TtsSayFinished.topic():
-                    # Verify siteId/id/session_id
+                    # Verify site_id/id/session_id
                     json_payload = json.loads(msg.payload)
                     if (
-                        check_siteId(args, json_payload)
+                        check_site_id(args, json_payload)
                         and (json_payload.get("session_id", "") == session_id)
                         and (json_payload.get("id", "") == sayId)
                     ):
@@ -439,7 +441,7 @@ def speak(args, client, siteId):
             TtsSay(
                 text=sentence,
                 lang=args.language,
-                siteId=siteId,
+                site_id=site_id,
                 id=sayId,
                 session_id=session_id,
             ),
@@ -457,7 +459,7 @@ def speak(args, client, siteId):
 # -----------------------------------------------------------------------------
 
 
-def wake(args, client, siteId):
+def wake(args, client, site_id):
     """Wait until wake word is detected"""
     from .wake import HotwordToggleOn, HotwordDetected, HotwordToggleOff
 
@@ -488,7 +490,7 @@ def wake(args, client, siteId):
 
     if args.toggle:
         # toggleOn
-        publish(client, HotwordToggleOn(siteId=siteId))
+        publish(client, HotwordToggleOn(site_id=site_id))
 
     # Wait for detection
     _LOGGER.debug("Waiting for detected (wakeword_id=%s)", args.wakeword_id)
@@ -496,7 +498,7 @@ def wake(args, client, siteId):
 
     if args.toggle:
         # toggleOff
-        publish(client, HotwordToggleOff(siteId=siteId))
+        publish(client, HotwordToggleOff(site_id=site_id))
 
     # Print result
     assert result_message is not None
