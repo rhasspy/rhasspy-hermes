@@ -248,16 +248,16 @@ def transcribe(args, client, siteId):
         done_event = threading.Event()
         result_topic = ""
         text_captured = None
-        sessionId = str(uuid4())
+        session_id = str(uuid4())
 
         def on_message(client, userdata, msg):
             nonlocal result_topic, text_captured
             try:
                 if msg.topic == AsrTextCaptured.topic():
-                    # Verify siteId/sessionId
+                    # Verify siteId/session_id
                     json_payload = json.loads(msg.payload)
                     if check_siteId(args, json_payload) and (
-                        json_payload.get("sessionId", "") == sessionId
+                        json_payload.get("session_id", "") == session_id
                     ):
                         # Matched
                         result_topic = msg.topic
@@ -270,7 +270,7 @@ def transcribe(args, client, siteId):
 
         with wav_file:
             # startListening
-            publish(client, AsrStartListening(siteId=siteId, sessionId=sessionId))
+            publish(client, AsrStartListening(siteId=siteId, session_id=session_id))
 
             # Send WAV chunks (audioFrame)
             for wav_chunk in AudioFrame.iter_wav_chunked(
@@ -279,10 +279,10 @@ def transcribe(args, client, siteId):
                 client.publish(frame_topic, wav_chunk)
 
             # stopListening
-            publish(client, AsrStopListening(siteId=siteId, sessionId=sessionId))
+            publish(client, AsrStopListening(siteId=siteId, session_id=session_id))
 
         _LOGGER.debug(
-            "Waiting for textCaptured (%s, sessionId=%s)", wav_name, sessionId
+            "Waiting for textCaptured (%s, session_id=%s)", wav_name, session_id
         )
 
         # Wait for textCaptured
@@ -323,17 +323,17 @@ def recognize(args, client, siteId):
         result_topic = ""
         result_message = None
         queryId = str(uuid4())
-        sessionId = str(uuid4())
+        session_id = str(uuid4())
 
         def on_message(client, userdata, msg):
             nonlocal result_topic, result_message
             try:
                 if NluIntent.is_topic(msg.topic):
-                    # Verify siteId/id/sessionId
+                    # Verify siteId/id/session_id
                     json_payload = json.loads(msg.payload)
                     if (
                         check_siteId(args, json_payload)
-                        and (json_payload.get("sessionId", "") == sessionId)
+                        and (json_payload.get("session_id", "") == session_id)
                         and (json_payload.get("id", "") == queryId)
                     ):
                         # Matched
@@ -341,22 +341,22 @@ def recognize(args, client, siteId):
                         result_message = NluIntent(**json_payload)
                         done_event.set()
                 elif msg.topic == NluIntentNotRecognized.topic():
-                    # Verify siteId/id/sessionId
+                    # Verify siteId/id/session_id
                     json_payload = json.loads(msg.payload)
                     if (
                         check_siteId(args, json_payload)
                         and (json_payload.get("id", "") == queryId)
-                        and (json_payload.get("sessionId", "") == sessionId)
+                        and (json_payload.get("session_id", "") == session_id)
                     ):
                         # Not recognized
                         result_topic = msg.topic
                         result_message = NluIntentNotRecognized(**json_payload)
                         done_event.set()
                 elif msg.topic == NluError.topic():
-                    # Verify siteId/sessionId
+                    # Verify siteId/session_id
                     json_payload = json.loads(msg.payload)
                     if check_siteId(args, json_payload) and (
-                        json_payload.get("sessionId", "") == sessionId
+                        json_payload.get("session_id", "") == session_id
                     ):
                         # Error
                         result_topic = msg.topic
@@ -371,7 +371,7 @@ def recognize(args, client, siteId):
         # Send query
         publish(
             client,
-            NluQuery(input=sentence, siteId=siteId, id=queryId, sessionId=sessionId),
+            NluQuery(input=sentence, siteId=siteId, id=queryId, session_id=session_id),
         )
 
         # Wait for response
@@ -411,17 +411,17 @@ def speak(args, client, siteId):
         result_topic = ""
         result_message = None
         sayId = str(uuid4())
-        sessionId = str(uuid4())
+        session_id = str(uuid4())
 
         def on_message(client, userdata, msg):
             nonlocal result_topic, result_message
             try:
                 if msg.topic == TtsSayFinished.topic():
-                    # Verify siteId/id/sessionId
+                    # Verify siteId/id/session_id
                     json_payload = json.loads(msg.payload)
                     if (
                         check_siteId(args, json_payload)
-                        and (json_payload.get("sessionId", "") == sessionId)
+                        and (json_payload.get("session_id", "") == session_id)
                         and (json_payload.get("id", "") == sayId)
                     ):
                         # Matched
@@ -441,7 +441,7 @@ def speak(args, client, siteId):
                 lang=args.language,
                 siteId=siteId,
                 id=sayId,
-                sessionId=sessionId,
+                session_id=session_id,
             ),
         )
 

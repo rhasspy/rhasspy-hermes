@@ -323,7 +323,11 @@ class HermesClient:
 
             self.mqtt_client.publish(topic, payload)
         except Exception:
-            self.logger.exception("publish")
+            self.logger.exception(
+                "publish (message=%s, topic_args=%s)",
+                message.__class__.__name__,
+                topic_args,
+            )
 
     async def publish_all(self, async_generator: GeneratorType):
         """Enumerate all messages in an async generator publish them"""

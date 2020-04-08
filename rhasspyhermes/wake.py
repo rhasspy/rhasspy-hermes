@@ -63,7 +63,7 @@ class HotwordDetected(Message):
     model_id: str
     model_version: str = ""
     model_type: str = "personal"
-    currentSensitivity: float = 1.0
+    current_sensitivity: float = 1.0
     site_id: str = "default"
 
     # Rhasspy specific
@@ -148,11 +148,11 @@ class Hotword:
     # Actual words used to activate hotword
     modelWords: str
 
-    # Optional model version
-    model_version: typing.Optional[str] = None
+    # Model version
+    model_version: str = ""
 
-    # Optional model type (personal, unversal)
-    model_type: typing.Optional[str] = None
+    # Model type (personal, unversal)
+    model_type: str = "personal"
 
 
 @dataclass
