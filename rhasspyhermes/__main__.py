@@ -300,7 +300,7 @@ def recognize(args, client, site_id):
     """Recognize intent(s) from one or more sentences using hermes/nlu"""
     from .nlu import NluQuery, NluIntent, NluIntentNotRecognized, NluError
 
-    client.subscribe(NluIntent.topic(intentName="#"))
+    client.subscribe(NluIntent.topic(intent_name="#"))
     client.subscribe(NluIntentNotRecognized.topic())
     client.subscribe(NluError.topic())
 
