@@ -1,14 +1,15 @@
 """Tests for rhasspyhermes.nlu"""
 from rhasspyhermes.nlu import NluError, NluIntent, NluIntentNotRecognized, NluQuery
 
-intentName = "testIntent"
+intent_name = "testIntent"
 
 
 def test_nlu_intent():
     """Test NluIntent."""
-    assert NluIntent.is_topic(NluIntent.topic(intentName=intentName))
+    assert NluIntent.is_topic(NluIntent.topic(intent_name=intent_name))
     assert (
-        NluIntent.get_intentName(NluIntent.topic(intentName=intentName)) == intentName
+        NluIntent.get_intent_name(NluIntent.topic(intent_name=intent_name))
+        == intent_name
     )
 
 

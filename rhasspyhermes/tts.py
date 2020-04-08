@@ -1,6 +1,8 @@
-"""Messages for hermes/tts"""
+"""Messages for text to speech."""
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
+from dataclasses_json import LetterCase, dataclass_json
 
 from .base import Message
 
@@ -10,10 +12,10 @@ class TtsSay(Message):
     """Send text to be spoken by the text to speech component."""
 
     text: str
-    lang: str = ""
-    id: str = ""
-    siteId: str = "default"
-    sessionId: str = ""
+    site_id: str = "default"
+    lang: typing.Optional[str] = None
+    id: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -24,9 +26,9 @@ class TtsSay(Message):
 class TtsSayFinished(Message):
     """Sent when text to speech component has finished speaking some text."""
 
-    id: str = ""
-    siteId: str = "default"
-    sessionId: str = ""
+    site_id: str = "default"
+    id: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -42,19 +44,20 @@ class TtsSayFinished(Message):
 class GetVoices(Message):
     """Get available voices for text to speech system."""
 
-    id: str = ""
-    siteId: str = "default"
+    id: typing.Optional[str] = None
+    site_id: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "rhasspy/tts/getVoices"
 
 
+@dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class Voice:
     """Information about a single TTS voice."""
 
-    voiceId: str
+    voice_id: str
     description: str = ""
 
 
@@ -62,9 +65,9 @@ class Voice:
 class Voices(Message):
     """Response to getVoices."""
 
-    voices: typing.Dict[str, Voice] = field(default_factory=dict)
-    id: str = ""
-    siteId: str = "default"
+    voices: typing.Dict[str, Voice]
+    id: typing.Optional[str] = None
+    site_id: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -73,12 +76,28 @@ class Voices(Message):
 
 @dataclass
 class TtsError(Message):
-    """Error from TTS component."""
+    """Error from TTS component.
+
+
+    Attributes
+    ----------
+    error: str
+        A description of the error that occurred
+
+    site_id: str = "default"
+        The id of the site where the error occurred
+
+    context: Optional[str] = None
+        Additional information on the context in which the error occurred
+
+    session_id: Optional[str] = None
+        The id of the session, if there is an active session
+    """
 
     error: str
-    context: str = ""
-    siteId: str = "default"
-    sessionId: str = ""
+    site_id: str = "default"
+    context: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:

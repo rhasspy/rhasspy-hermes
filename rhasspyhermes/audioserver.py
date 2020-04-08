@@ -1,4 +1,4 @@
-"""Messages for hermes/audioServer"""
+"""Messages for audio recording and playback."""
 import audioop
 import io
 import re
@@ -13,7 +13,13 @@ from .base import Message
 
 @dataclass
 class AudioFrame(Message):
-    """Captured sound frame."""
+    """Recorded frame of audio.
+
+    Attributes
+    ----------
+    wav_bytes: bytes
+        Recorded audio frame in WAV format
+    """
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/audioFrame$")
 
@@ -25,21 +31,23 @@ class AudioFrame(Message):
 
     @classmethod
     def is_binary_payload(cls) -> bool:
+        """True if payload is not JSON."""
         return True
 
     @classmethod
     def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
         return True
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "+")
-        return f"hermes/audioServer/{siteId}/audioFrame"
+        site_id = kwargs.get("site_id", "+")
+        return f"hermes/audioServer/{site_id}/audioFrame"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> typing.Optional[str]:
-        """Get siteId from a topic"""
+    def get_site_id(cls, topic: str) -> typing.Optional[str]:
+        """Get site id from a topic"""
         match = re.match(AudioFrame.TOPIC_PATTERN, topic)
         assert match, "Not an audioFrame topic"
         return match.group(1)
@@ -92,7 +100,13 @@ class AudioFrame(Message):
 
 @dataclass
 class AudioPlayBytes(Message):
-    """Play WAV sound on specific site."""
+    """Play WAV sound on specific site.
+
+    Attributes
+    ----------
+    wav_bytes: bytes
+        Audio to play in WAV format
+    """
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/playBytes/([^/]+)$")
 
@@ -104,29 +118,31 @@ class AudioPlayBytes(Message):
 
     @classmethod
     def is_binary_payload(cls) -> bool:
+        """True if payload is not JSON."""
         return True
 
     @classmethod
     def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
         return True
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "+")
-        requestId = kwargs.get("requestId", "#")
-        return f"hermes/audioServer/{siteId}/playBytes/{requestId}"
+        site_id = kwargs.get("site_id", "+")
+        request_id = kwargs.get("request_id", "#")
+        return f"hermes/audioServer/{site_id}/playBytes/{request_id}"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> typing.Optional[str]:
-        """Get siteId from a topic"""
+    def get_site_id(cls, topic: str) -> typing.Optional[str]:
+        """Get site id from a topic"""
         match = re.match(AudioPlayBytes.TOPIC_PATTERN, topic)
         assert match, "Not a playBytes topic"
         return match.group(1)
 
     @classmethod
-    def get_requestId(cls, topic: str) -> str:
-        """Get requestId from a topic"""
+    def get_request_id(cls, topic: str) -> str:
+        """Get request id from a topic"""
         match = re.match(AudioPlayBytes.TOPIC_PATTERN, topic)
         assert match, "Not a playBytes topic"
         return match.group(2)
@@ -139,26 +155,36 @@ class AudioPlayBytes(Message):
 
 @dataclass
 class AudioPlayFinished(Message):
-    """Sent when audio service has finished playing a sound."""
+    """Sent when audio service has finished playing a sound.
+
+    Attributes
+    ----------
+    id: str : Optional[str] = None
+        Request identifier for the request passed from playBytes topic
+
+    session_id: Optional[str] = None
+        The id of the session, if there is an active session
+    """
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/playFinished$")
 
-    id: str = ""
-    sessionId: str = ""
+    id: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
         return True
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "+")
-        return f"hermes/audioServer/{siteId}/playFinished"
+        site_id = kwargs.get("site_id", "+")
+        return f"hermes/audioServer/{site_id}/playFinished"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> typing.Optional[str]:
-        """Get siteId from a topic"""
+    def get_site_id(cls, topic: str) -> typing.Optional[str]:
+        """Get site_id from a topic"""
         match = re.match(AudioPlayFinished.TOPIC_PATTERN, topic)
         assert match, "Not a playFinished topic"
         return match.group(1)
@@ -170,10 +196,21 @@ class AudioPlayFinished(Message):
 
 
 # -----------------------------------------------------------------------------
+# Rhasspy Only
+# -----------------------------------------------------------------------------
 
 
 class AudioDeviceMode(str, Enum):
-    """Input/output mode of an audio device"""
+    """Mode of an audio device.
+
+    Values
+    ------
+    INPUT
+        Recording device
+
+    OUTPUT
+        Playback device
+    """
 
     INPUT = "input"
     OUTPUT = "output"
@@ -181,22 +218,55 @@ class AudioDeviceMode(str, Enum):
 
 @dataclass
 class AudioDevice:
-    """Description of an audio device."""
+    """Description of an audio device.
+
+    Attributes
+    ----------
+    mode: AudioDeviceMode
+        Recording or playback device
+
+    id: str
+        Unique id of audio device
+
+    name: Optional[str] = None
+        Optional human-readable name of audio device
+
+    description: Optional[str] = None
+        Optional human-readable description of audio device
+
+    working: Optional[bool] = None
+        Status of audio device if tested
+    """
 
     mode: AudioDeviceMode
     id: str
-    name: str
-    description: str
+    name: typing.Optional[str] = None
+    description: typing.Optional[str] = None
     working: typing.Optional[bool] = None
 
 
 @dataclass
 class AudioGetDevices(Message):
-    """Get details for audio input devices."""
+    """Get details for available audio devices.
+
+    Attributes
+    ----------
+    modes: List[AudioDeviceMode]
+        Device types to get information about
+
+    id: Optional[str] = None
+        Unique id to be returned in response
+
+    site_id: str = "default"
+        Id of the site where devices are located
+
+    test: bool = False
+        True if devices should be tested
+    """
 
     modes: typing.List[AudioDeviceMode]
-    id: str = ""
-    siteId: str = "default"
+    site_id: str = "default"
+    id: typing.Optional[str] = None
     test: bool = False
 
     @classmethod
@@ -207,10 +277,22 @@ class AudioGetDevices(Message):
 
 @dataclass
 class AudioDevices(Message):
-    """Response to getDevices."""
+    """Response to getDevices.
 
-    id: str = ""
-    siteId: str = "default"
+    Attributes
+    ----------
+    id: Optional[str] = None
+        Unique id from request
+
+    site_id: str = "default"
+        Id of site where devices are located
+
+    devices: List[AudioDevice] = []
+        Description of requested device types
+    """
+
+    site_id: str = "default"
+    id: typing.Optional[str] = None
     devices: typing.List[AudioDevice] = field(default_factory=list)
 
     @classmethod
@@ -218,24 +300,16 @@ class AudioDevices(Message):
         """Get topic for message."""
         return "rhasspy/audioServer/devices"
 
-    @classmethod
-    def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
-        """Construct message from dictionary."""
-        message_dict = cls.only_fields(message_dict)
-        device_dicts = message_dict.pop("devices", [])
-        devices = [AudioDevice(**d) for d in device_dicts]
-
-        return AudioDevices(**message_dict, devices=devices)  # type: ignore
-
-
-# -----------------------------------------------------------------------------
-# Rhasspy Only
-# -----------------------------------------------------------------------------
-
 
 @dataclass
 class AudioSessionFrame(Message):
-    """Captured sound frame for a session."""
+    """Recorded audio frame for a specific session.
+
+    Attributes
+    ----------
+    wav_bytes: bytes
+        Audio frame in WAV format
+    """
 
     TOPIC_PATTERN = re.compile(
         r"^hermes/audioServer/([^/]+)/([^/]+)/audioSessionFrame$"
@@ -249,33 +323,36 @@ class AudioSessionFrame(Message):
 
     @classmethod
     def is_binary_payload(cls) -> bool:
+        """True if payload is not JSON."""
         return True
 
     @classmethod
     def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
         return True
 
     @classmethod
     def is_session_in_topic(cls) -> bool:
+        """True if session id is in topic."""
         return True
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "+")
-        sessionId = kwargs.get("sessionId", "+")
-        return f"hermes/audioServer/{siteId}/{sessionId}/audioSessionFrame"
+        site_id = kwargs.get("site_id", "+")
+        session_id = kwargs.get("session_id", "+")
+        return f"hermes/audioServer/{site_id}/{session_id}/audioSessionFrame"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> typing.Optional[str]:
-        """Get siteId from a topic"""
+    def get_site_id(cls, topic: str) -> typing.Optional[str]:
+        """Get site id from a topic"""
         match = re.match(AudioSessionFrame.TOPIC_PATTERN, topic)
         assert match, "Not an audioSessionFrame topic"
         return match.group(1)
 
     @classmethod
-    def get_sessionId(cls, topic: str) -> typing.Optional[str]:
-        """Get sessionId from a topic"""
+    def get_session_id(cls, topic: str) -> typing.Optional[str]:
+        """Get session id from a topic"""
         match = re.match(AudioSessionFrame.TOPIC_PATTERN, topic)
         assert match, "Not an audioSessionFrame topic"
         return match.group(2)
@@ -288,7 +365,14 @@ class AudioSessionFrame(Message):
 
 @dataclass
 class AudioSummary(Message):
-    """Summary of recent audio frame(s) for diagnostic purposes."""
+    """Summary of recent audio frame(s) for diagnostic purposes.
+
+    debiased_energy: float
+        Audio energy computed using get_debiased_energy
+
+    is_speech: typing.Optional[bool] = None
+        True/false if VAD detected speech
+    """
 
     TOPIC_PATTERN = re.compile(r"^hermes/audioServer/([^/]+)/audioSummary$")
 
@@ -311,17 +395,18 @@ class AudioSummary(Message):
 
     @classmethod
     def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
         return True
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        siteId = kwargs.get("siteId", "+")
-        return f"hermes/audioServer/{siteId}/audioSummary"
+        site_id = kwargs.get("site_id", "+")
+        return f"hermes/audioServer/{site_id}/audioSummary"
 
     @classmethod
-    def get_siteId(cls, topic: str) -> typing.Optional[str]:
-        """Get siteId from a topic"""
+    def get_site_id(cls, topic: str) -> typing.Optional[str]:
+        """Get site id from a topic"""
         match = re.match(AudioSummary.TOPIC_PATTERN, topic)
         assert match, "Not an audioSummary topic"
         return match.group(1)
@@ -334,9 +419,15 @@ class AudioSummary(Message):
 
 @dataclass
 class SummaryToggleOn(Message):
-    """Activate sending of audio summaries."""
+    """Activate sending of audio summaries.
 
-    siteId: str = "default"
+    Attributes
+    ----------
+    site_id: str = "default"
+        Id of site where audio is being recorded
+    """
+
+    site_id: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -345,9 +436,15 @@ class SummaryToggleOn(Message):
 
 @dataclass
 class SummaryToggleOff(Message):
-    """Deactivate sending of audio summaries."""
+    """Deactivate sending of audio summaries.
 
-    siteId: str = "default"
+    Attributes
+    ----------
+    site_id: str = "default"
+        Id of site where audio is being recorded
+    """
+
+    site_id: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -356,9 +453,15 @@ class SummaryToggleOff(Message):
 
 @dataclass
 class AudioToggleOn(Message):
-    """Activate audio output system."""
+    """Activate audio output system.
 
-    siteId: str = "default"
+    Attributes
+    ----------
+    site_id: str = "default"
+        Id of site where audio should be turned off
+    """
+
+    site_id: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -367,9 +470,15 @@ class AudioToggleOn(Message):
 
 @dataclass
 class AudioToggleOff(Message):
-    """Deactivate audio output system."""
+    """Deactivate audio output system.
 
-    siteId: str = "default"
+    Attributes
+    ----------
+    site_id: str = "default"
+        Id of site where audio should be turned on
+    """
+
+    site_id: str = "default"
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -378,12 +487,27 @@ class AudioToggleOff(Message):
 
 @dataclass
 class AudioRecordError(Message):
-    """Error from audio input component."""
+    """Error from audio input component.
+
+    Attributes
+    ----------
+    error: str
+        A description of the error that occurred
+
+    site_id: str = "default"
+        The id of the site where the error occurred
+
+    context: Optional[str] = None
+        Additional information on the context in which the error occurred
+
+    session_id: Optional[str] = None
+        The id of the session, if there is an active session
+    """
 
     error: str
-    context: str = ""
-    siteId: str = "default"
-    sessionId: str = ""
+    site_id: str = "default"
+    context: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -393,12 +517,27 @@ class AudioRecordError(Message):
 
 @dataclass
 class AudioPlayError(Message):
-    """Error from audio output component."""
+    """Error from audio output component.
+
+    Attributes
+    ----------
+    error: str
+        A description of the error that occurred
+
+    site_id: str = "default"
+        The id of the site where the error occurred
+
+    context: Optional[str] = None
+        Additional information on the context in which the error occurred
+
+    session_id: Optional[str] = None
+        The id of the session, if there is an active session
+    """
 
     error: str
-    context: str = ""
-    siteId: str = "default"
-    sessionId: str = ""
+    site_id: str = "default"
+    context: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:

@@ -7,8 +7,6 @@ from rhasspyhermes.asr import (
     AsrToggleOn,
 )
 
-siteId = "testSiteId"
-
 
 def test_asr_toggle_on():
     """Test AsrToggleOn."""

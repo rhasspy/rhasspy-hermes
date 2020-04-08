@@ -161,7 +161,7 @@ def get_args() -> argparse.Namespace:
         help="Toggle hotword service on/off around detection",
     )
     wake_parser.add_argument(
-        "--wakewordId",
+        "--wakeword-id",
         action="append",
         default=["default"],
         help="Wake word id(s) to wait for",
@@ -461,9 +461,9 @@ def wake(args, client, siteId):
     """Wait until wake word is detected"""
     from .wake import HotwordToggleOn, HotwordDetected, HotwordToggleOff
 
-    assert args.wakewordId, "No wake word ids"
-    for wakewordId in args.wakewordId:
-        client.subscribe(HotwordDetected.topic(wakewordId=wakewordId))
+    assert args.wakeword_id, "No wake word ids"
+    for wakeword_id in args.wakeword_id:
+        client.subscribe(HotwordDetected.topic(wakeword_id=wakeword_id))
 
     done_event = threading.Event()
     result_topic = ""
@@ -473,9 +473,9 @@ def wake(args, client, siteId):
         nonlocal result_topic, result_message
         try:
             if HotwordDetected.is_topic(msg.topic):
-                # Verify wakewordId
-                wakewordId = HotwordDetected.get_wakewordId(msg.topic)
-                if wakewordId in args.wakewordId:
+                # Verify wakeword_id
+                wakeword_id = HotwordDetected.get_wakeword_id(msg.topic)
+                if wakeword_id in args.wakeword_id:
                     # Matched
                     json_payload = json.loads(msg.payload)
                     result_topic = msg.topic
@@ -491,7 +491,7 @@ def wake(args, client, siteId):
         publish(client, HotwordToggleOn(siteId=siteId))
 
     # Wait for detection
-    _LOGGER.debug("Waiting for detected (wakewordId=%s)", args.wakewordId)
+    _LOGGER.debug("Waiting for detected (wakeword_id=%s)", args.wakeword_id)
     done_event.wait()
 
     if args.toggle:

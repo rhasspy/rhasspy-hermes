@@ -1,38 +1,39 @@
 """Tests for rhasspyhermes.audioserver"""
 from rhasspyhermes.audioserver import AudioFrame, AudioPlayBytes, AudioPlayFinished
 
-siteId = "testSiteId"
-requestId = "testRequestId"
+site_id = "testSiteId"
+request_id = "testRequestId"
 
 
 def test_audio_frame():
     """Test AudioFrame."""
-    assert AudioFrame.is_topic(AudioFrame.topic(siteId=siteId))
-    assert AudioFrame.get_siteId(AudioFrame.topic(siteId=siteId)) == siteId
+    assert AudioFrame.is_topic(AudioFrame.topic(site_id=site_id))
+    assert AudioFrame.get_site_id(AudioFrame.topic(site_id=site_id)) == site_id
 
 
 def test_audio_play_bytes():
     """Test AudioPlayBytes."""
     assert AudioPlayBytes.is_topic(
-        AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
+        AudioPlayBytes.topic(site_id=site_id, request_id=request_id)
     )
     assert (
-        AudioPlayBytes.get_siteId(
-            AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
+        AudioPlayBytes.get_site_id(
+            AudioPlayBytes.topic(site_id=site_id, request_id=request_id)
         )
-        == siteId
+        == site_id
     )
     assert (
-        AudioPlayBytes.get_requestId(
-            AudioPlayBytes.topic(siteId=siteId, requestId=requestId)
+        AudioPlayBytes.get_request_id(
+            AudioPlayBytes.topic(site_id=site_id, request_id=request_id)
         )
-        == requestId
+        == request_id
     )
 
 
 def test_audio_play_finished():
     """Test AudioPlayFinished."""
-    assert AudioPlayFinished.is_topic(AudioPlayFinished.topic(siteId=siteId))
+    assert AudioPlayFinished.is_topic(AudioPlayFinished.topic(site_id=site_id))
     assert (
-        AudioPlayFinished.get_siteId(AudioPlayFinished.topic(siteId=siteId)) == siteId
+        AudioPlayFinished.get_site_id(AudioPlayFinished.topic(site_id=site_id))
+        == site_id
     )

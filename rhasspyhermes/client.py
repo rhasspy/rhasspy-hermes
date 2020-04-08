@@ -31,7 +31,7 @@ class HermesClient:
         self,
         client_name: str,
         mqtt_client,
-        siteIds: typing.Optional[typing.List[str]] = None,
+        site_ids: typing.Optional[typing.List[str]] = None,
         sample_rate: int = 16000,
         sample_width: int = 2,
         channels: int = 1,
@@ -65,9 +65,9 @@ class HermesClient:
         # Cache of all MQTT topics in case we get disconnected
         self.all_mqtt_topics: typing.Set[str] = set()
 
-        # Set of valid siteIds (empty for all)
-        self.siteIds: typing.Set[str] = set(siteIds) if siteIds else set()
-        self.siteId = "default" if not siteIds else siteIds[0]
+        # Set of valid site ids (empty for all)
+        self.site_ids: typing.Set[str] = set(site_ids) if site_ids else set()
+        self.site_id = "default" if not site_ids else site_ids[0]
 
         # Required audio format
         self.sample_rate = sample_rate
@@ -84,14 +84,14 @@ class HermesClient:
         """Subscribe to one or more Hermes messages."""
         topics: typing.List[str] = []
 
-        if self.siteIds:
-            # Specific siteIds
-            for siteId in self.siteIds:
+        if self.site_ids:
+            # Specific site ids
+            for site_id in self.site_ids:
                 for message_type in message_types:
-                    topics.append(message_type.topic(siteId=siteId))
+                    topics.append(message_type.topic(site_id=site_id))
                     self.subscribed_types.add(message_type)
         else:
-            # All siteIds
+            # All site ids
             for message_type in message_types:
                 topics.append(message_type.topic())
                 self.subscribed_types.add(message_type)
@@ -120,8 +120,8 @@ class HermesClient:
     async def on_message(
         self,
         message: Message,
-        siteId: typing.Optional[str] = None,
-        sessionId: typing.Optional[str] = None,
+        site_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
         topic: typing.Optional[str] = None,
     ) -> GeneratorType:
         """Override to handle Hermes messages."""
@@ -207,11 +207,14 @@ class HermesClient:
                 )
 
                 # Check against all known message types
-                for message, siteId, sessionId in HermesClient.parse_mqtt_message(
-                    mqtt_message.topic, mqtt_message.payload, self.subscribed_types
+                for message, site_id, session_id in HermesClient.parse_mqtt_message(
+                    mqtt_message.topic,
+                    mqtt_message.payload,
+                    self.subscribed_types,
+                    logger=self.logger,
                 ):
 
-                    if not self.valid_siteId(siteId):
+                    if not self.valid_site_id(site_id):
                         continue
 
                     # Log messages
@@ -230,8 +233,8 @@ class HermesClient:
                         self.publish_all(
                             self.on_message(
                                 message,
-                                siteId=siteId,
-                                sessionId=sessionId,
+                                site_id=site_id,
+                                session_id=session_id,
                                 topic=mqtt_message.topic,
                             )
                         )
@@ -250,6 +253,7 @@ class HermesClient:
         topic: str,
         payload: typing.Union[str, bytes],
         subscribed_types: typing.Iterable[typing.Type[Message]],
+        logger=None,
     ) -> typing.Iterable[
         typing.Tuple[Message, typing.Optional[str], typing.Optional[str]]
     ]:
@@ -258,13 +262,13 @@ class HermesClient:
             # Check against all known message types
             for message_type in subscribed_types:
                 if message_type.is_topic(topic):
-                    siteId: typing.Optional[str] = None
+                    site_id: typing.Optional[str] = None
 
-                    # Verify siteId and parse
+                    # Verify site id and parse
                     if message_type.is_binary_payload():
                         # Binary
                         if message_type.is_site_in_topic():
-                            siteId = message_type.get_siteId(topic)
+                            site_id = message_type.get_site_id(topic)
 
                         # Assume payload is only argument to constructor
                         message = message_type(payload)  # type: ignore
@@ -272,23 +276,26 @@ class HermesClient:
                         # JSON
                         json_payload = json.loads(payload)
                         if message_type.is_site_in_topic():
-                            siteId = message_type.get_siteId(topic)
+                            site_id = message_type.get_site_id(topic)
                         else:
-                            siteId = json_payload.get("siteId", "default")
+                            site_id = json_payload.get("siteId")
 
                         # Load from JSON
                         message = message_type.from_dict(json_payload)
 
-                    sessionId: typing.Optional[str] = None
+                    session_id: typing.Optional[str] = None
                     if message_type.is_session_in_topic():
-                        sessionId = message_type.get_sessionId(topic)
+                        session_id = message_type.get_session_id(topic)
 
-                    yield (message, siteId, sessionId)
+                    yield (message, site_id, session_id)
 
                     # Assume only one message type will match
                     break
         except Exception:
-            logging.exception("parse_mqtt_message (topic=%s)", topic)
+            if not logger:
+                logger = logging
+
+            logger.exception("parse_mqtt_message (topic=%s)", topic)
 
     # -------------------------------------------------------------------------
     # Publishing Messages
@@ -334,10 +341,10 @@ class HermesClient:
     # Utility Methods
     # -------------------------------------------------------------------------
 
-    def valid_siteId(self, siteId: typing.Optional[str]):
-        """True if siteId is valid for this client."""
-        if siteId and self.siteIds:
-            return siteId in self.siteIds
+    def valid_site_id(self, site_id: typing.Optional[str]):
+        """True if site id is valid for this client."""
+        if site_id and self.site_ids:
+            return site_id in self.site_ids
 
         return True
 

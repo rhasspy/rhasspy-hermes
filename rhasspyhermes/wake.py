@@ -1,8 +1,10 @@
 """Messages for hermes/hotword"""
 import re
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
+
+from dataclasses_json import LetterCase, dataclass_json
 
 from .base import Message
 
@@ -20,13 +22,17 @@ class HotwordToggleReason(str, Enum):
 class HotwordToggleOn(Message):
     """Activate the wake word component."""
 
-    siteId: str = "default"
+    site_id: str = "default"
 
+    # ------------
     # Rhasspy only
+    # ------------
+
     reason: HotwordToggleReason = HotwordToggleReason.UNKNOWN
 
     @classmethod
     def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
         return "hermes/hotword/toggleOn"
 
 
@@ -34,13 +40,17 @@ class HotwordToggleOn(Message):
 class HotwordToggleOff(Message):
     """Deactivate the wake word component."""
 
-    siteId: str = "default"
+    site_id: str = "default"
 
+    # ------------
     # Rhasspy only
+    # ------------
+
     reason: HotwordToggleReason = HotwordToggleReason.UNKNOWN
 
     @classmethod
     def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
         return "hermes/hotword/toggleOff"
 
 
@@ -50,25 +60,25 @@ class HotwordDetected(Message):
 
     TOPIC_PATTERN = re.compile(r"^hermes/hotword/([^/]+)/detected$")
 
-    modelId: str
-    modelVersion: str = ""
-    modelType: str = "personal"
+    model_id: str
+    model_version: str = ""
+    model_type: str = "personal"
     currentSensitivity: float = 1.0
-    siteId: str = "default"
+    site_id: str = "default"
 
     # Rhasspy specific
-    sessionId: str = ""
-    sendAudioCaptured: typing.Optional[bool] = None
+    session_id: str = ""
+    send_audio_captured: typing.Optional[bool] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get topic for message (wakewordId)."""
-        wakewordId = kwargs.get("wakewordId", "+")
-        return f"hermes/hotword/{wakewordId}/detected"
+        """Get topic for message (wakeword_id)."""
+        wakeword_id = kwargs.get("wakeword_id", "+")
+        return f"hermes/hotword/{wakeword_id}/detected"
 
     @classmethod
-    def get_wakewordId(cls, topic: str) -> str:
-        """Get wakewordId from a topic"""
+    def get_wakeword_id(cls, topic: str) -> str:
+        """Get wakeword_id from a topic"""
         match = re.match(HotwordDetected.TOPIC_PATTERN, topic)
         assert match, "Not a detected topic"
         return match.group(1)
@@ -80,21 +90,37 @@ class HotwordDetected(Message):
 
 
 # -----------------------------------------------------------------------------
-# Rhasspy Only
+# Rhasspy Only Messages
 # -----------------------------------------------------------------------------
 
 
 @dataclass
 class HotwordError(Message):
-    """Error from Hotword component."""
+    """Error from Hotword component.
+
+    Attributes
+    ----------
+    error: str
+        A description of the error that occurred
+
+    site_id: str = "default"
+        The id of the site where the error occurred
+
+    context: Optional[str] = None
+        Additional information on the context in which the error occurred
+
+    session_id: Optional[str] = None
+        The id of the session, if there is an active session
+    """
 
     error: str
-    context: str = ""
-    siteId: str = "default"
+    site_id: str = "default"
+    context: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get Hermes topic"""
+        """Get MQTT topic"""
         return "hermes/error/hotword"
 
 
@@ -102,8 +128,8 @@ class HotwordError(Message):
 class GetHotwords(Message):
     """Request to list available hotwords."""
 
-    id: str = ""
-    siteId: str = "default"
+    site_id: str = "default"
+    id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -111,29 +137,33 @@ class GetHotwords(Message):
         return "rhasspy/hotword/getHotwords"
 
 
+@dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class Hotword:
     """Description of a single hotword (used in hotwords message)."""
 
     # Unique ID of hotword model
-    modelId: str
+    model_id: str
 
     # Actual words used to activate hotword
     modelWords: str
 
-    modelVersion: str = ""
-    modelType: str = "personal"
+    # Optional model version
+    model_version: typing.Optional[str] = None
+
+    # Optional model type (personal, unversal)
+    model_type: typing.Optional[str] = None
 
 
 @dataclass
 class Hotwords(Message):
     """Response to getHotwords."""
 
-    models: typing.Dict[str, Hotword] = field(default_factory=dict)
-    id: str = ""
-    siteId: str = "default"
+    models: typing.Dict[str, Hotword]
+    site_id: str = "default"
+    id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic"""
+        """Get MQTT topic for this message type."""
         return "rhasspy/hotword/hotwords"

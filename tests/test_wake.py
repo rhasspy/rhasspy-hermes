@@ -1,15 +1,15 @@
 """Tests for rhasspyhermes.wake"""
 from rhasspyhermes.wake import HotwordDetected, HotwordToggleOff, HotwordToggleOn
 
-wakewordId = "testWakeWord"
+wakeword_id = "testWakeWord"
 
 
 def test_hotword_detected():
     """Test HotwordDetected."""
-    assert HotwordDetected.is_topic(HotwordDetected.topic(wakewordId=wakewordId))
+    assert HotwordDetected.is_topic(HotwordDetected.topic(wakeword_id=wakeword_id))
     assert (
-        HotwordDetected.get_wakewordId(HotwordDetected.topic(wakewordId=wakewordId))
-        == wakewordId
+        HotwordDetected.get_wakeword_id(HotwordDetected.topic(wakeword_id=wakeword_id))
+        == wakeword_id
     )
 
 

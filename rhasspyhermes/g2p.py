@@ -1,91 +1,120 @@
-"""Messages for rhasspy/g2p"""
+"""Messages for looking up/guessing word pronunciations."""
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
+from dataclasses_json import LetterCase, dataclass_json
 
 from rhasspyhermes.base import Message
 
 
 @dataclass
 class G2pPronounce(Message):
-    """Get phonetic pronunciation for words."""
+    """Get phonetic pronunciation for words.
 
-    # User id that will be returned in response
-    id: str = ""
+    Attributes
+    ----------
+    id: Optional[str] = None
+        Unique id for request
 
-    # Words to guess pronunciations for
-    words: typing.List[str] = field(default_factory=list)
+    site_id: str = "default"
+        Id of site to request pronunciations from
 
-    # Hermes siteId/sessionId
-    siteId: str = "default"
-    sessionId: str = ""
+    words: List[str]
+        Words to guess pronunciations for
 
-    # Maximum number of guesses to return
-    numGuesses: int = 5
+    session_id: typing.Optional[str] = None
+        Id of active session, if there is one
+
+    num_guesses: int = 5
+        Maximum number of guesses to return for words not in dictionary
+    """
+
+    words: typing.List[str]
+    id: typing.Optional[str] = None
+    site_id: str = "default"
+    session_id: typing.Optional[str] = None
+    num_guesses: int = 5
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic"""
+        """Get MQTT topic for this message."""
         return "rhasspy/g2p/pronounce"
 
 
+@dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class G2pPronunciation:
-    """Phonetic pronunciation for a single word (in G2pPhonemes)."""
+    """Phonetic pronunciation for a single word.
 
-    # Phonetic pronunciation for word
-    phonemes: typing.List[str] = field(default_factory=list)
+    Attributes
+    ----------
+    phonemes: List[str]
+        Phonetic pronunciation for word
 
-    # True if this pronunciation was guessed using a g2p model.
-    # False if it came from a pronunciation dictionary.
     guessed: bool = False
+        True if this pronunciation was guessed using a g2p model.
+        False if it came from a pronunciation dictionary.
+    """
+
+    phonemes: typing.List[str]
+    guessed: typing.Optional[bool] = None
 
 
 @dataclass
 class G2pPhonemes(Message):
-    """Response to G2pPronunciation."""
+    """Response to g2p/pronounce.
 
-    # Guessed or looked up pronunciations
-    wordPhonemes: typing.Dict[str, typing.List[G2pPronunciation]] = field(
-        default_factory=dict
-    )
+    Attributes
+    ----------
+    id: Optional[str] = None
+        Unique id from request
 
-    # User id from request
-    id: str = ""
+    site_id: str = "default"
+        Id of site where pronunciations were requested
 
-    # Hermes siteId/sessionId
-    siteId: str = "default"
-    sessionId: str = ""
+    word_phonemes: Dict[str, List[G2pPronunciation]]
+        Guessed or looked up pronunciations
+
+    session_id: typing.Optional[str] = None
+        Id of active session, if there is one
+    """
+
+    word_phonemes: typing.Dict[str, typing.List[G2pPronunciation]]
+    id: typing.Optional[str] = None
+    site_id: str = "default"
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic"""
+        """Get MQTT topic for this message."""
         return "rhasspy/g2p/phonemes"
-
-    @classmethod
-    def from_dict(cls, message_dict: typing.Dict[str, typing.Any]):
-        """Construct message from dictionary."""
-        message_dict = cls.only_fields(message_dict)
-        word_phonemes = message_dict.pop("wordPhonemes", {})
-        message = G2pPhonemes(**message_dict)
-        message.wordPhonemes = {
-            word: [G2pPronunciation(**word_pron) for word_pron in word_phonemes[word]]
-            for word in word_phonemes
-        }
-
-        return message
 
 
 @dataclass
 class G2pError(Message):
-    """Error from G2P component."""
+    """Error from G2P component.
+
+    Attributes
+    ----------
+    error: str
+        A description of the error that occurred
+
+    site_id: str = "default"
+        The id of the site where the error occurred
+
+    context: Optional[str] = None
+        Additional information on the context in which the error occurred
+
+    session_id: Optional[str] = None
+        The id of the session, if there is an active session
+    """
 
     error: str
-    context: str = ""
-    id: str = ""
-    siteId: str = "default"
-    sessionId: str = ""
+    site_id: str = "default"
+    context: typing.Optional[str] = None
+    session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic"""
+        """Get MQTT topic for this message."""
         return "rhasspy/error/g2p"

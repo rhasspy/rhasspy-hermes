@@ -16,9 +16,9 @@ def add_hermes_args(parser: argparse.ArgumentParser):
     parser.add_argument("--username", help="MQTT username")
     parser.add_argument("--password", help="MQTT password")
     parser.add_argument(
-        "--siteId",
+        "--site-id",
         action="append",
-        help="Hermes siteId(s) to listen for (default: all)",
+        help="Hermes site id(s) to listen for (default: all)",
     )
     parser.add_argument(
         "--debug", action="store_true", help="Print DEBUG messages to the console"
