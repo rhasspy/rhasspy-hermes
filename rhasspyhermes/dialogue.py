@@ -1,7 +1,11 @@
 """Messages for hermes/dialogueManager"""
 import typing
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
+
+from dataclasses_json import DataClassJsonMixin, LetterCase, dataclass_json
+from dataclasses_json.core import Json
 
 from .base import Message
 
@@ -23,8 +27,9 @@ class DialogueActionType(str, Enum):
     NOTIFICATION = "notification"
 
 
+@dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
-class DialogueAction:
+class DialogueAction(DataClassJsonMixin):
     """Dialogue session action.
 
     Attributes
@@ -53,8 +58,9 @@ class DialogueAction:
     send_intent_not_recognized: bool = False
 
 
+@dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
-class DialogueNotification:
+class DialogueNotification(DataClassJsonMixin):
     """Dialogue session notification.
 
     Attributes
@@ -98,6 +104,7 @@ class DialogueSessionTerminationReason(str, Enum):
     ERROR = "error"
 
 
+@dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class DialogueSessionTermination:
     """Dialogue session termination type.
@@ -139,6 +146,25 @@ class DialogueStartSession(Message):
     init: typing.Union[DialogueAction, DialogueNotification]
     site_id: str = "default"
     custom_data: typing.Optional[str] = None
+
+    # pylint: disable=W0221
+    @classmethod
+    def from_dict(
+        cls: typing.Type["DialogueStartSession"],
+        message_dict: Json,
+        *,
+        infer_missing=False
+    ) -> "DialogueStartSession":
+        assert isinstance(message_dict, Mapping)
+        init = message_dict.pop("init")
+        if init["type"] == DialogueActionType.NOTIFICATION:
+            message_dict["init"] = DialogueNotification.from_dict(init)
+        else:
+            message_dict["init"] = DialogueAction.from_dict(init)
+
+        return super(DialogueStartSession, cls).from_dict(
+            message_dict, infer_missing=infer_missing
+        )
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -338,6 +364,7 @@ class DialogueIntentNotRecognized(Message):
         return "hermes/dialogueManager/intentNotRecognized"
 
 
+@dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class DialogueConfigureIntent:
     """Enable/disable specific intent in configure message.
