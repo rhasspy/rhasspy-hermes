@@ -54,7 +54,31 @@ class NluQuery(Message):
 
 @dataclass
 class NluIntentParsed(Message):
-    """Intent successfully parsed."""
+    """Intent successfully parsed.
+
+    Preceeds full intent message.
+
+    Attributes
+    ----------
+    input: str
+        The user input that has generated this intent
+
+    intent: Intent
+        Structured description of the intent classification
+
+    site_id: str = "default"
+        Site where the user interaction took place
+
+    id: Optional[str] = None
+        Request id from NLU query, if any
+
+    slots: Optional[List[Slot]] = None
+        Structured description of the detected slots for this intent if any
+
+    session_id: Optional[str] = None
+        Session of the intent detection. The client code must use it to continue
+        or end the session.
+    """
 
     input: str
     intent: Intent
@@ -66,13 +90,22 @@ class NluIntentParsed(Message):
     @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
-        return f"hermes/nlu/intentParsed"
+        return "hermes/nlu/intentParsed"
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class AsrTokenTime:
-    """Time when ASR token was detected."""
+    """Time when ASR token was detected.
+
+    Attributes
+    ----------
+    start: float
+        Start time of token relative to beginning of utterance
+
+    end: float
+        End time of token relative to beginning of utterance
+    """
 
     start: float
     end: float
@@ -81,7 +114,25 @@ class AsrTokenTime:
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class AsrToken:
-    """Token from automated speech recognizer."""
+    """Token from automated speech recognizer.
+
+    Attributes
+    ----------
+    value: str
+        Text value of token
+
+    confidence: float
+        Confidence of the token, between 0 and 1, 1 being confident
+
+    range_start: int
+        The start range in which the token is in the original input
+
+    range_end: int
+        The end range in which the token is in the original input
+
+    time: Optional[AsrTokenTime] = None
+        Structured time when this token was detected
+    """
 
     value: str
     confidence: float
@@ -92,7 +143,44 @@ class AsrToken:
 
 @dataclass
 class NluIntent(Message):
-    """Intent recognized."""
+    """Recognized intent.
+
+    Attributes
+    ----------
+    input: str
+        The user input that has generated this intent
+
+    intent: Intent
+        Structured description of the intent classification
+
+    site_id: str = "default"
+        Site where the user interaction took place
+
+    id: Optional[str] = None
+        Request id from NLU query, if any
+
+    slots: Optional[List[Slot]] = None
+        Structured description of the detected slots for this intent if any
+
+    session_id: Optional[str] = None
+        Session of the intent detection. The client code must use it to continue
+        or end the session.
+
+    custom_data: Optional[str] = None
+        Custom data provided by start/continue/end session messages
+
+    asr_tokens: Optional[List[List[AsrToken]]] = None
+        Structured description of the tokens the ASR captured on for this intent
+
+    asr_confidence: Optional[float] = None
+        Speech recognizer confidence score between 0 and 1, 1 being sure
+
+    raw_input: Optional[str] = None
+        Original query input before substitutions, such as number replacement
+
+    wakeword_id: Optional[str] = None
+        Id of the wake word that triggered this session
+    """
 
     TOPIC_PATTERN = re.compile(r"^hermes/intent/([^/]+)$")
 
@@ -181,18 +269,36 @@ class NluIntent(Message):
 
 @dataclass
 class NluIntentNotRecognized(Message):
-    """Intent not recognized."""
+    """Intent not recognized.
+
+    Attributes
+    ----------
+    input: str
+        The input, if any that generated this event
+
+    site_id: str = "default"
+        Site where the user interaction took place
+
+    id: Optional[str] = None
+        Request id from NLU query, if any
+
+    custom_data: Optional[str] = None
+        Custom data provided by start/continue/end session messages
+
+    session_id: Optional[str] = None
+        Session identifier of the session that generated this intent not recognized event
+    """
 
     input: str
     site_id: str = "default"
     id: typing.Optional[str] = None
+    custom_data: typing.Optional[str] = None
     session_id: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
         return "hermes/nlu/intentNotRecognized"
 
-    # pylint: disable=R0201
     def to_rhasspy_dict(self) -> typing.Dict[str, typing.Any]:
         """Return an empty Rhasspy intent dictionary."""
         tokens = self.input.split()
@@ -244,7 +350,19 @@ class NluError(Message):
 
 @dataclass
 class NluTrain(Message):
-    """Request to retrain from sentences"""
+    """Request to retrain NLU from intent graph.
+
+    Attributes
+    ----------
+    graph_path: str
+        Path to the graph file
+
+    id: Optional[str] = None
+        Unique id for training request
+
+    graph_format: typing.Optional[str] = None
+        Optional format of the graph file
+    """
 
     TOPIC_PATTERN = re.compile(r"^rhasspy/nlu/([^/]+)/train$")
 
@@ -254,6 +372,7 @@ class NluTrain(Message):
 
     @classmethod
     def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
         return True
 
     @classmethod
@@ -277,7 +396,14 @@ class NluTrain(Message):
 
 @dataclass
 class NluTrainSuccess(Message):
-    """Result from successful training"""
+    """Result from successful training.
+
+    Attributes
+    ----------
+
+    id: Optional[str] = None
+        Unique id from training request
+    """
 
     TOPIC_PATTERN = re.compile(r"^rhasspy/nlu/([^/]+)/trainSuccess$")
 
@@ -285,6 +411,7 @@ class NluTrainSuccess(Message):
 
     @classmethod
     def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
         return True
 
     @classmethod

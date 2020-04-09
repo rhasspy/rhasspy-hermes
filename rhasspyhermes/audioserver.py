@@ -5,7 +5,7 @@ import re
 import time
 import typing
 import wave
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 from .base import Message
@@ -281,19 +281,19 @@ class AudioDevices(Message):
 
     Attributes
     ----------
+    devices: List[AudioDevice]
+        Description of requested device types
+
     id: Optional[str] = None
         Unique id from request
 
     site_id: str = "default"
         Id of site where devices are located
-
-    devices: List[AudioDevice] = []
-        Description of requested device types
     """
 
+    devices: typing.List[AudioDevice]
     site_id: str = "default"
     id: typing.Optional[str] = None
-    devices: typing.List[AudioDevice] = field(default_factory=list)
 
     @classmethod
     def topic(cls, **kwargs) -> str:

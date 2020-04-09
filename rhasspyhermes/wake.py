@@ -10,7 +10,22 @@ from .base import Message
 
 
 class HotwordToggleReason(str, Enum):
-    """Reason for hotword toggle on/off."""
+    """Reason for hotword toggle on/off.
+
+    Values
+    ------
+    UNKNOWN
+        Overrides all other reasons
+
+    DIALOGUE_SESSION
+        Dialogue session is active
+
+    PLAY_AUDIO
+        Audio is currently playing
+
+    TTS_SAY
+        Text to speech system is currently speaking
+    """
 
     UNKNOWN = ""
     DIALOGUE_SESSION = "dialogueSession"
@@ -20,7 +35,16 @@ class HotwordToggleReason(str, Enum):
 
 @dataclass
 class HotwordToggleOn(Message):
-    """Activate the wake word component."""
+    """Activate the wake word component.
+
+    Attributes
+    ----------
+    site_id: str = "default"
+        Id of the site where the hotword component should be enabled
+
+    reason: HotwordToggleReason = UNKNOWN
+        Reason for enabling the hotword component
+    """
 
     site_id: str = "default"
 
@@ -38,7 +62,16 @@ class HotwordToggleOn(Message):
 
 @dataclass
 class HotwordToggleOff(Message):
-    """Deactivate the wake word component."""
+    """Deactivate the wake word component.
+
+    Attributes
+    ----------
+    site_id: str = "default"
+        Id of the site where the hotword component should be disabled
+
+    reason: HotwordToggleReason = UNKNOWN
+        Reason for disabling the hotword component
+    """
 
     site_id: str = "default"
 
@@ -56,7 +89,33 @@ class HotwordToggleOff(Message):
 
 @dataclass
 class HotwordDetected(Message):
-    """Wake word component has detected a specific wake word."""
+    """Wake word component has detected a specific wake word.
+
+    Attributes
+    ----------
+    model_id: str
+        The id of the model that triggered the wake word
+
+    model_version: str = ""
+        The version of the model
+
+    model_type: str = "personal"
+        The type of the model. Possible values: universal or personal
+
+    current_sensitivity: float = 1.0
+        The sensitivity configured in the model at the time of the detection
+
+    site_id: str = "default"
+        The id of the site where the wake word was detected
+
+    session_id: Optional[str] = None
+        The desired id of the dialogue session created after detection.
+        Leave empty to have one auto-generated.
+
+    send_audio_captured: Optional[bool] = None
+        True if audio captured from ASR should be emitted on
+        rhasspy/asr/{site_id}/{session_id}/audioCaptured
+    """
 
     TOPIC_PATTERN = re.compile(r"^hermes/hotword/([^/]+)/detected$")
 
@@ -66,8 +125,11 @@ class HotwordDetected(Message):
     current_sensitivity: float = 1.0
     site_id: str = "default"
 
-    # Rhasspy specific
-    session_id: str = ""
+    # ------------
+    # Rhasspy only
+    # ------------
+
+    session_id: typing.Optional[str] = None
     send_audio_captured: typing.Optional[bool] = None
 
     @classmethod
@@ -126,7 +188,16 @@ class HotwordError(Message):
 
 @dataclass
 class GetHotwords(Message):
-    """Request to list available hotwords."""
+    """Request to list available hotwords.
+
+    Attributes
+    ----------
+    site_id: str = "default"
+        Id of site where hotword component exists
+
+    id: typing.Optional[str] = None
+        Unique id passed to response
+    """
 
     site_id: str = "default"
     id: typing.Optional[str] = None
@@ -140,26 +211,46 @@ class GetHotwords(Message):
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class Hotword:
-    """Description of a single hotword (used in hotwords message)."""
+    """Description of a single hotword.
 
-    # Unique ID of hotword model
+    Attributes
+    ----------
     model_id: str
+        Unique ID of hotword model
 
-    # Actual words used to activate hotword
-    modelWords: str
+    model_words: str
+        Actual words used to activate hotword
 
-    # Model version
     model_version: str = ""
+        Model version
 
-    # Model type (personal, unversal)
+    model_type: str = "personal"
+        Model type (personal, unversal)
+    """
+
+    model_id: str
+    model_words: str
+    model_version: str = ""
     model_type: str = "personal"
 
 
 @dataclass
 class Hotwords(Message):
-    """Response to getHotwords."""
+    """Response to getHotwords.
 
-    models: typing.Dict[str, Hotword]
+    Attributes
+    ----------
+    models: typing.List[Hotword]
+        List of available hotwords
+
+    site_id: str = "default"
+        Id of site where hotwords were requested
+
+    id: typing.Optional[str] = None
+        Unique id passed from request
+    """
+
+    models: typing.List[Hotword]
     site_id: str = "default"
     id: typing.Optional[str] = None
 
