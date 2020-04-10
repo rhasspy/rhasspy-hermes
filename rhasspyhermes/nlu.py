@@ -247,22 +247,23 @@ class NluIntent(Message):
         }
 
     @classmethod
-    def make_asr_tokens(cls, tokens: typing.List[str]) -> typing.List[AsrToken]:
+    def make_asr_tokens(cls, tokens: typing.List[typing.Any]) -> typing.List[AsrToken]:
         """Create ASR token objects from words."""
         asr_tokens: typing.List[AsrToken] = []
         start: int = 0
 
         for token in tokens:
+            token_str = str(token)
             asr_tokens.append(
                 AsrToken(
-                    value=token,
+                    value=token_str,
                     confidence=1.0,
                     range_start=start,
-                    range_end=(start + len(token)),
+                    range_end=(start + len(token_str)),
                 )
             )
 
-            start += len(token) + 1
+            start += len(token_str) + 1
 
         return asr_tokens
 
