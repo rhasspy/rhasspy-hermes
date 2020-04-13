@@ -230,6 +230,7 @@ class NluIntent(Message):
                 {
                     "entity": s.slot_name,
                     "value": s.value.get("value"),
+                    "value_details": s.value,
                     "raw_value": s.raw_value,
                     "start": s.start,
                     "end": s.end,
