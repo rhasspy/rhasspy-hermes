@@ -105,6 +105,9 @@ class AsrStartListening(Message):
 
     wakeword_id: Optional[str] = None
         Optional id of wakeword used to activate ASR
+
+    intent_filter: Optional[List[str]] = None
+        A list of intent names to restrict the ASR on
     """
 
     site_id: str = "default"
@@ -117,6 +120,7 @@ class AsrStartListening(Message):
     stop_on_silence: bool = True
     send_audio_captured: bool = False
     wakeword_id: typing.Optional[str] = None
+    intent_filter: typing.Optional[typing.List[str]] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:

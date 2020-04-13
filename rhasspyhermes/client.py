@@ -125,7 +125,16 @@ class HermesClient:
         topic: typing.Optional[str] = None,
     ) -> GeneratorType:
         """Override to handle Hermes messages."""
-        self.logger.warning("Using default message handler.")
+        yield None
+
+    async def on_message_blocking(
+        self,
+        message: Message,
+        site_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
+        topic: typing.Optional[str] = None,
+    ) -> GeneratorType:
+        """Override to handle Hermes messages and block."""
         yield None
 
     async def on_raw_message(self, topic: str, payload: bytes):
@@ -228,7 +237,17 @@ class HermesClient:
                     elif not isinstance(message, AudioSummary):
                         self.logger.debug("<- %s", message)
 
-                    # Publish all responses
+                    # Publish all responses (blocking)
+                    await self.publish_all(
+                        self.on_message_blocking(
+                            message,
+                            site_id=site_id,
+                            session_id=session_id,
+                            topic=mqtt_message.topic,
+                        )
+                    )
+
+                    # Publish all responses (non-blocking)
                     asyncio.create_task(
                         self.publish_all(
                             self.on_message(
