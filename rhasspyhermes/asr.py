@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from .base import Message
+from .nlu import AsrToken, AsrTokenTime
 
 
 class AsrToggleReason(str, Enum):
@@ -173,6 +174,9 @@ class AsrTextCaptured(Message):
 
     wakeword_id: Optional[str] = None
         Optional id of wakeword used to activate ASR
+
+    asr_tokens: Optional[List[List[AsrToken]]] = None
+        Structured description of the tokens the ASR captured on for this intent
     """
 
     text: str
@@ -187,6 +191,7 @@ class AsrTextCaptured(Message):
     # ------------
 
     wakeword_id: typing.Optional[str] = None
+    asr_tokens: typing.Optional[typing.List[typing.List[AsrToken]]] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
