@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from .base import Message
-from .nlu import AsrToken, AsrTokenTime
+from .nlu import AsrToken
 
 
 class AsrToggleReason(str, Enum):
@@ -255,6 +255,8 @@ class AsrTrain(Message):
     graph_path: str
     id: typing.Optional[str] = None
     graph_format: typing.Optional[str] = None
+    sentences: typing.Optional[typing.Dict[str, str]] = None
+    slots: typing.Optional[typing.Dict[str, typing.List[str]]] = None
 
     @classmethod
     def is_site_in_topic(cls) -> bool:

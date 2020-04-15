@@ -11,8 +11,10 @@ import wave
 from concurrent.futures import CancelledError
 from pathlib import Path
 
+from .asr import AsrTrain
 from .audioserver import AudioFrame, AudioSessionFrame, AudioSummary
 from .base import Message
+from .nlu import NluTrain
 
 # -----------------------------------------------------------------------------
 
@@ -228,13 +230,18 @@ class HermesClient:
 
                     # Log messages
                     if message.is_binary_payload():
+                        # Class name + size
                         if not isinstance(message, (AudioFrame, AudioSessionFrame)):
                             self.logger.debug(
                                 "<- %s(%s byte(s))",
                                 message.__class__.__name__,
                                 len(mqtt_message.payload),
                             )
+                    elif isinstance(message, (AsrTrain, NluTrain)):
+                        # Just class name
+                        self.logger.debug("<- %s", message.__class__.__name__)
                     elif not isinstance(message, AudioSummary):
+                        # Entire message
                         self.logger.debug("<- %s", message)
 
                     # Publish all responses (blocking)
@@ -334,7 +341,14 @@ class HermesClient:
                     )
             else:
                 # Log most JSON messages
-                if not isinstance(message, AudioSummary):
+                if isinstance(message, (AsrTrain, NluTrain)):
+                    # Just class name
+                    self.logger.debug("-> %s", message.__class__.__name__)
+                    self.logger.debug(
+                        "Publishing %s bytes(s) to %s", len(payload), topic
+                    )
+                elif not isinstance(message, AudioSummary):
+                    # Entire message
                     self.logger.debug("-> %s", message)
                     self.logger.debug(
                         "Publishing %s bytes(s) to %s", len(payload), topic
