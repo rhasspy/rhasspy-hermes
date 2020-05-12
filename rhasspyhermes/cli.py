@@ -1,6 +1,7 @@
 """Methods for command-line parsing."""
 import argparse
 import logging
+import ssl
 
 import paho.mqtt.client as mqtt
 
@@ -15,6 +16,21 @@ def add_hermes_args(parser: argparse.ArgumentParser):
     )
     parser.add_argument("--username", help="MQTT username")
     parser.add_argument("--password", help="MQTT password")
+
+    parser.add_argument(
+        "--tls-ca-certs", help="MQTT TLS Certificate Authority certificate files"
+    )
+    parser.add_argument("--tls-certfile", help="MQTT TLS certificate file (PEM)")
+    parser.add_argument("--tls-keyfile", help="MQTT TLS key file (PEM)")
+    parser.add_argument(
+        "--tls-cert-reqs",
+        default="CERT_REQUIRED",
+        choices=["CERT_REQUIRED", "CERT_OPTIONAL", "CERT_NONE"],
+        help="MQTT TLS certificate requirements (default: CERT_REQUIRED)",
+    )
+    parser.add_argument("--tls-version", help="MQTT TLS version (default: highest)")
+    parser.add_argument("--tls-ciphers", help="MQTT TLS ciphers to use")
+
     parser.add_argument(
         "--site-id",
         action="append",
@@ -42,5 +58,21 @@ def connect(client: mqtt.Client, args: argparse.Namespace):
     """Connect to MQTT broker."""
     if args.username:
         client.username_pw_set(args.username, args.password)
+
+    # TLS
+    if args.tls_ca_certs or args.tls_certfile or args.tls_keyfile:
+        # TLS is enabled
+        if args.tls_version is None:
+            # Use highest TLS version
+            args.tls_version = ssl.PROTOCOL_TLS
+
+        client.tls_set(
+            ca_certs=args.tls_ca_certs,
+            certfile=args.certfile,
+            keyfile=args.keyfile,
+            cert_reqs=getattr(ssl, args.tls_cert_reqs),
+            tls_version=args.tls_version,
+            ciphers=args.tls_ciphers,
+        )
 
     client.connect(args.host, args.port)
