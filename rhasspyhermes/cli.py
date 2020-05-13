@@ -17,6 +17,7 @@ def add_hermes_args(parser: argparse.ArgumentParser):
     parser.add_argument("--username", help="MQTT username")
     parser.add_argument("--password", help="MQTT password")
 
+    parser.add_argument("--tls", action="store_true", help="Enable MQTT TLS")
     parser.add_argument(
         "--tls-ca-certs", help="MQTT TLS Certificate Authority certificate files"
     )
@@ -60,7 +61,7 @@ def connect(client: mqtt.Client, args: argparse.Namespace):
         client.username_pw_set(args.username, args.password)
 
     # TLS
-    if args.tls_ca_certs or args.tls_certfile or args.tls_keyfile:
+    if args.tls:
         # TLS is enabled
         if args.tls_version is None:
             # Use highest TLS version
