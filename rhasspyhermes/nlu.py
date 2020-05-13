@@ -96,6 +96,33 @@ class NluIntentParsed(Message):
         """Get topic for message."""
         return "hermes/nlu/intentParsed"
 
+    def to_rhasspy_dict(self) -> typing.Dict[str, typing.Any]:
+        """Convert to Rhasspy format."""
+        return {
+            "intent": {
+                "name": self.intent.intent_name,
+                "confidence": self.intent.confidence_score,
+            },
+            "entities": [
+                {
+                    "entity": s.slot_name,
+                    "value": s.value.get("value"),
+                    "value_details": s.value,
+                    "raw_value": s.raw_value,
+                    "start": s.start,
+                    "end": s.end,
+                    "raw_start": (s.raw_start if s.raw_start is not None else s.start),
+                    "raw_end": (s.raw_end if s.raw_end is not None else s.end),
+                }
+                for s in self.slots or []
+            ],
+            "slots": {s.slot_name: s.value.get("value") for s in self.slots or []},
+            "text": self.input,
+            "raw_text": self.input or "",
+            "tokens": self.input.split(),
+            "raw_tokens": self.input.split(),
+        }
+
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
