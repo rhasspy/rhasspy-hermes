@@ -3,8 +3,6 @@ import re
 import typing
 from dataclasses import dataclass
 
-from dataclasses_json import LetterCase, dataclass_json
-
 from .base import Message
 
 
