@@ -182,7 +182,7 @@ class NluIntent(Message):
         Id of the wake word that triggered this session
     """
 
-    TOPIC_PATTERN = re.compile(r"^hermes/intent/([^/]+)$")
+    TOPIC_PATTERN = re.compile(r"^hermes/intent/(.+)$")
 
     input: str
     intent: Intent
