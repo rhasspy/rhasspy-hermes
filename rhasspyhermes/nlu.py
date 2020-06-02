@@ -32,6 +32,9 @@ class NluQuery(Message):
 
     wakeword_id: Optional[str] = None
         Optional id of wakeword used to activate ASR
+
+    lang: Optional[str] = None
+        Language of the session
     """
 
     input: str
@@ -45,6 +48,7 @@ class NluQuery(Message):
     # ------------
 
     wakeword_id: typing.Optional[str] = None
+    lang: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -180,6 +184,9 @@ class NluIntent(Message):
 
     wakeword_id: Optional[str] = None
         Id of the wake word that triggered this session
+
+    lang: Optional[str] = None
+        Language of the session
     """
 
     TOPIC_PATTERN = re.compile(r"^hermes/intent/(.+)$")
@@ -200,6 +207,7 @@ class NluIntent(Message):
 
     raw_input: typing.Optional[str] = None
     wakeword_id: typing.Optional[str] = None
+    lang: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:

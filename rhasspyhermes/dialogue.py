@@ -141,11 +141,15 @@ class DialogueStartSession(Message):
         Additional information that can be provided by the handler. Each message
         related to the new session - sent by the Dialogue Manager - will contain
         this data.
+
+    lang: Optional[str] = None
+        Language of the session.
     """
 
     init: typing.Union[DialogueAction, DialogueNotification]
     site_id: str = "default"
     custom_data: typing.Optional[str] = None
+    lang: typing.Optional[str] = None
 
     # pylint: disable=W0221
     @classmethod
@@ -211,11 +215,15 @@ class DialogueSessionStarted(Message):
 
     custom_data: typing.Optional[str] = None
         Custom data provided in the startSession message
+
+    lang: Optional[str] = None
+        Language of the session.
     """
 
     session_id: str
     site_id: str = "default"
     custom_data: typing.Optional[str] = None
+    lang: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
@@ -253,6 +261,10 @@ class DialogueContinueSession(Message):
 
     slot: typing.Optional[str] = None
         Unused
+
+    lang: Optional[str] = None
+        Language of the session.
+        Leave empty to use setting from start of session.
     """
 
     session_id: str
@@ -263,6 +275,12 @@ class DialogueContinueSession(Message):
     intent_filter: typing.Optional[typing.List[str]] = None
     send_intent_not_recognized: bool = False
     slot: typing.Optional[str] = None
+
+    # ------------
+    # Rhasspy only
+    # ------------
+
+    lang: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:

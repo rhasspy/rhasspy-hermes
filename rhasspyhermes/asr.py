@@ -109,10 +109,15 @@ class AsrStartListening(Message):
 
     intent_filter: Optional[List[str]] = None
         A list of intent names to restrict the ASR on
+
+    lang: Optional[str] = None
+        Language of the incoming audio stream.
+        Typically set in hotword detected or dialogue startSession messages.
     """
 
     site_id: str = "default"
     session_id: typing.Optional[str] = None
+    lang: typing.Optional[str] = None
 
     # ------------
     # Rhasspy only
@@ -177,6 +182,9 @@ class AsrTextCaptured(Message):
 
     asr_tokens: Optional[List[List[AsrToken]]] = None
         Structured description of the tokens the ASR captured on for this intent
+
+    lang: Optional[str] = None
+        Language of the session
     """
 
     text: str
@@ -192,6 +200,7 @@ class AsrTextCaptured(Message):
 
     wakeword_id: typing.Optional[str] = None
     asr_tokens: typing.Optional[typing.List[typing.List[AsrToken]]] = None
+    lang: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:

@@ -115,6 +115,10 @@ class HotwordDetected(Message):
     send_audio_captured: Optional[bool] = None
         True if audio captured from ASR should be emitted on
         rhasspy/asr/{site_id}/{session_id}/audioCaptured
+
+    lang: Optional[str] = None
+        Language of the detected wake word.
+        Copied by dialogue manager into subsequent ASR, NLU messages.
     """
 
     TOPIC_PATTERN = re.compile(r"^hermes/hotword/([^/]+)/detected$")
@@ -131,6 +135,7 @@ class HotwordDetected(Message):
 
     session_id: typing.Optional[str] = None
     send_audio_captured: typing.Optional[bool] = None
+    lang: typing.Optional[str] = None
 
     @classmethod
     def topic(cls, **kwargs) -> str:
