@@ -2,9 +2,10 @@ name: Deploy docs
 
 on:
   push:
-    paths: 
+    paths:
     - 'docs/**'
     - 'scripts/build-docs.sh'
+    - 'rhasspyhermes/**'
     branches:
     - master
 
