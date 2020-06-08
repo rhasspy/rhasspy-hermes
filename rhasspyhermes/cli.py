@@ -1,6 +1,7 @@
 """Methods for command-line parsing."""
 import argparse
 import logging
+import os
 import ssl
 
 import paho.mqtt.client as mqtt
@@ -69,11 +70,11 @@ def connect(client: mqtt.Client, args: argparse.Namespace):
 
         client.tls_set(
             ca_certs=args.tls_ca_certs,
-            certfile=args.certfile,
-            keyfile=args.keyfile,
+            certfile=os.path.expandvars(args.certfile),
+            keyfile=os.path.expandvars(args.keyfile),
             cert_reqs=getattr(ssl, args.tls_cert_reqs),
             tls_version=args.tls_version,
-            ciphers=args.tls_ciphers,
+            ciphers=(args.tls_ciphers or None),
         )
 
     client.connect(args.host, args.port)
