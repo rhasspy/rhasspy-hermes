@@ -34,7 +34,7 @@ class HandleToggleOn(Message):
     >>> on = HandleToggleOn()
     >>> on
     HandleToggleOn(site_id='default')
-    >>> on.to_json()
+    >>> on.payload()
     '{"siteId": "default"}'
     >>> on.topic()
     'rhasspy/handle/toggleOn'
@@ -95,7 +95,7 @@ class HandleToggleOff(Message):
     >>> off = HandleToggleOff()
     >>> off
     HandleToggleOff(site_id='default')
-    >>> off.to_json()
+    >>> off.payload()
     '{"siteId": "default"}'
     >>> off.topic()
     'rhasspy/handle/toggleOff'
