@@ -4,7 +4,7 @@ import os
 import setuptools
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(this_dir, "README.md"), "r") as readme_file:
+with open(os.path.join(this_dir, "README.rst"), "r") as readme_file:
     long_description = readme_file.read()
 
 with open(os.path.join(this_dir, "requirements.txt"), "r") as requirements_file:
@@ -29,6 +29,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
     ],
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     python_requires=">=3.7",
 )

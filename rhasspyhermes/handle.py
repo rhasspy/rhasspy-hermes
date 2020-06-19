@@ -1,4 +1,4 @@
-"""Messages for intent handling."""
+"""Rhasspy-only messages for intent handling."""
 from dataclasses import dataclass
 
 from .base import Message
@@ -8,17 +8,60 @@ from .base import Message
 class HandleToggleOn(Message):
     """Enable intent handling.
 
-    Attributes
-    ----------
-    site_id: str = "default"
-        Id of site to enable intent handling
-    """
+    The corresponding MQTT message has the following properties:
+
+    Topic: ``rhasspy/handle/toggleOn``
+
+    Payload (JSON):
+
+    .. list-table::
+      :widths: 10 10 80
+      :header-rows: 1
+
+      * - Key
+        - Type
+        - Description
+      * - siteId
+        - string
+        - The id of the site where intent handling should be enabled. Defaults to ``"default"``.
+
+    Example
+    -------
+
+    In Python:
+
+    >>> from rhasspyhermes.handle import HandleToggleOn
+    >>> on = HandleToggleOn()
+    >>> on
+    HandleToggleOn(site_id='default')
+    >>> on.to_json()
+    '{"siteId": "default"}'
+    >>> on.topic()
+    'rhasspy/handle/toggleOn'
+
+    With ``mosquitto_pub``:
+
+    .. code-block:: shell
+
+      mosquitto_pub -h <HOSTNAME> -t 'rhasspy/handle/toggleOn' -m '{"siteId": "default"}'
+
+    Note
+    ----
+
+    This is a Rhasspy-only message."""
 
     site_id: str = "default"
+    """The id of the site where intent handling should be enabled"""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic for message."""
+        """Get MQTT topic for this message.
+
+        Returns
+        -------
+        str
+            ``"rhasspy/handle/toggleOn"``
+        """
         return "rhasspy/handle/toggleOn"
 
 
@@ -26,15 +69,58 @@ class HandleToggleOn(Message):
 class HandleToggleOff(Message):
     """Disable intent handling.
 
-    Attributes
-    ----------
-    site_id: str = "default"
-        Id of site to disable intent handling
-    """
+    The corresponding MQTT message has the following properties:
+
+    Topic: ``rhasspy/handle/toggleOff``
+
+    Payload (JSON):
+
+    .. list-table::
+      :widths: 10 10 80
+      :header-rows: 1
+
+      * - Key
+        - Type
+        - Description
+      * - siteId
+        - string
+        - The id of the site where intent handling should be disabled. Defaults to ``"default"``.
+
+    Example
+    -------
+
+    In Python:
+
+    >>> from rhasspyhermes.handle import HandleToggleOff
+    >>> off = HandleToggleOff()
+    >>> off
+    HandleToggleOff(site_id='default')
+    >>> off.to_json()
+    '{"siteId": "default"}'
+    >>> off.topic()
+    'rhasspy/handle/toggleOff'
+
+    With ``mosquitto_pub``:
+
+    .. code-block:: shell
+
+      mosquitto_pub -h <HOSTNAME> -t 'rhasspy/handle/toggleOff' -m '{"siteId": "default"}'
+
+    Note
+    ----
+
+    This is a Rhasspy-only message."""
 
     site_id: str = "default"
+    """The id of the site where intent handling should be disabled"""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic for message."""
+        """Get MQTT topic for this message.
+
+        Returns
+        -------
+        str
+            ``"rhasspy/handle/toggleOff"``
+        """
         return "rhasspy/handle/toggleOff"
