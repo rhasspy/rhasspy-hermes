@@ -1,4 +1,4 @@
-"""Configuration file for the Sphinx documentation of rhasspy-hermes-app."""
+"""Configuration file for the Sphinx documentation of rhasspy-hermes."""
 
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:

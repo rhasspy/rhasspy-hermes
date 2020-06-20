@@ -39,7 +39,7 @@ class HandleToggleOn(Message):
     >>> on.topic()
     'rhasspy/handle/toggleOn'
 
-    With ``mosquitto_pub``:
+    Publish this message type with ``mosquitto_pub``:
 
     .. code-block:: shell
 
@@ -55,7 +55,7 @@ class HandleToggleOn(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic for this message.
+        """Get MQTT topic for this message type.
 
         Returns
         -------
@@ -100,7 +100,7 @@ class HandleToggleOff(Message):
     >>> off.topic()
     'rhasspy/handle/toggleOff'
 
-    With ``mosquitto_pub``:
+    Publish this message type with ``mosquitto_pub``:
 
     .. code-block:: shell
 
@@ -116,7 +116,7 @@ class HandleToggleOff(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic for this message.
+        """Get MQTT topic for this message type.
 
         Returns
         -------

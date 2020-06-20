@@ -91,7 +91,7 @@ class Message(DataClassJsonMixin, metaclass=ABCMeta):
         Returns
         -------
         bool
-            ``True`` if message payload is not JSON.
+            ``True`` if message payload is not JSON
 
         Example
         -------
@@ -109,7 +109,7 @@ class Message(DataClassJsonMixin, metaclass=ABCMeta):
         Returns
         -------
         bool
-            ``True`` if site id is part of topic.
+            ``True`` if site id is part of topic
 
         Example
         -------
@@ -127,7 +127,7 @@ class Message(DataClassJsonMixin, metaclass=ABCMeta):
         Returns
         -------
         bool
-            ``True`` if session id is part of topic.
+            ``True`` if session id is part of topic
 
         Example
         -------
@@ -145,7 +145,7 @@ class Message(DataClassJsonMixin, metaclass=ABCMeta):
         Returns
         -------
         str
-            The MQTT topic for this message type.
+            The MQTT topic for this message type
 
         Example
         -------
@@ -167,7 +167,7 @@ class Message(DataClassJsonMixin, metaclass=ABCMeta):
         Returns
         -------
         bool
-            ``True`` if topic is for this message type.
+            ``True`` if topic is for this message type
 
         Example
         --------
