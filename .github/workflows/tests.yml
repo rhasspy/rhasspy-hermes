@@ -57,7 +57,7 @@ jobs:
       - name: Install Python dependencies
         run: make venv
       - name: Make package
-        run: make
+        run: make dist
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
