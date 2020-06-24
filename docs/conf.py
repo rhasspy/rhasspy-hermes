@@ -1,5 +1,5 @@
-# Configuration file for the Sphinx documentation builder.
-#
+"""Configuration file for the Sphinx documentation of rhasspy-hermes."""
+
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "Rhasspy Hermes"
+# pylint: disable=redefined-builtin
 copyright = "2020, Michael Hansen"
 author = "Michael Hansen"
 
@@ -30,6 +31,13 @@ author = "Michael Hansen"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -40,15 +48,48 @@ extensions = [
 # This pattern also affects html_static_path and html_extra_path.
 # exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# Build list of references to ignore when running in nit-picky mode (-n option).
+nitpick_ignore = []
+
+for line in open("nitpick-exceptions"):
+    if line.strip() == "" or line.startswith("#"):
+        continue
+    dtype, target = line.split(maxsplit=1)
+    target = target.strip()
+    nitpick_ignore.append((dtype, target))
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ["_static"]
+
+html_context = {
+    "css_files": ["_static/theme_overrides.css"],  # override wide tables in RTD theme
+}
+
+# -- Extension configuration -------------------------------------------------
+
+# -- Options for intersphinx extension ---------------------------------------
+
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+
+# -- Options for todo extension ----------------------------------------------
+
+# If true, `todo` and `todoList` produce output, else they produce nothing.
+todo_include_todos = True
+
+# -- Options for Napoleon extension ------------------------------------------
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = True
+napoleon_use_param = True
+
+# -- Options for autodoc extension -------------------------------------------
+autodoc_default_options = {"show-inheritance": True}

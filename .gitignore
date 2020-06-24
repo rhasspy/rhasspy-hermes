@@ -4,6 +4,7 @@ __pycache__/
 coverage.xml
 .venv/
 dist/
+index.txt
 *.egg-info/
 .vscode/
 debian/rhasspy-hermes*

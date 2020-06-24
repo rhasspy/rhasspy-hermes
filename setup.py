@@ -9,7 +9,7 @@ this_dir = Path(__file__).parent
 
 # Load README in as long description
 long_description: str = ""
-readme_path = this_dir / "README.md"
+readme_path = this_dir / "README.rst"
 if readme_path.is_file():
     long_description = readme_path.read_text()
 
@@ -37,6 +37,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
     ],
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     python_requires=">=3.7",
 )

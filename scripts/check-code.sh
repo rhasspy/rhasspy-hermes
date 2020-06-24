@@ -22,7 +22,8 @@ python_files=(
 
 flake8 "${python_files[@]}"
 pylint "${python_files[@]}"
-mypy "${python_files[@]}"
+mypy "${python_files[@]}" --txt-report .
+cat index.txt
 black --check "${python_files[@]}"
 isort --check-only "${python_files[@]}"
 yamllint "${src_dir}"
