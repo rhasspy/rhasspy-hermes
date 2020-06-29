@@ -22,13 +22,13 @@ def add_hermes_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--tls-ca-certs", help="MQTT TLS Certificate Authority certificate files"
     )
-    parser.add_argument("--tls-certfile", help="MQTT TLS certificate file (PEM)")
-    parser.add_argument("--tls-keyfile", help="MQTT TLS key file (PEM)")
+    parser.add_argument("--tls-certfile", help="MQTT TLS client certificate file (PEM)")
+    parser.add_argument("--tls-keyfile", help="MQTT TLS client key file (PEM)")
     parser.add_argument(
         "--tls-cert-reqs",
         default="CERT_REQUIRED",
         choices=["CERT_REQUIRED", "CERT_OPTIONAL", "CERT_NONE"],
-        help="MQTT TLS certificate requirements (default: CERT_REQUIRED)",
+        help="MQTT TLS certificate requirements for broker (default: CERT_REQUIRED)",
     )
     parser.add_argument("--tls-version", help="MQTT TLS version (default: highest)")
     parser.add_argument("--tls-ciphers", help="MQTT TLS ciphers to use")
@@ -68,10 +68,15 @@ def connect(client: mqtt.Client, args: argparse.Namespace):
             # Use highest TLS version
             args.tls_version = ssl.PROTOCOL_TLS
 
+        if args.tls_certfile is not None:
+            args.tls_certfile = os.path.expandvars(args.tls_certfile)
+        if args.tls_keyfile is not None:
+            args.tls_keyfile = os.path.expandvars(args.tls_keyfile)
+
         client.tls_set(
             ca_certs=args.tls_ca_certs,
-            certfile=os.path.expandvars(args.certfile),
-            keyfile=os.path.expandvars(args.keyfile),
+            certfile=args.tls_certfile,
+            keyfile=args.tls_keyfile,
             cert_reqs=getattr(ssl, args.tls_cert_reqs),
             tls_version=args.tls_version,
             ciphers=(args.tls_ciphers or None),
