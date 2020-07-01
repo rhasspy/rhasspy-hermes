@@ -407,7 +407,7 @@ class DialogueConfigure(Message):
     Attributes
     ----------
     intents: List[DialogueConfigureIntent]
-        List of intents and whether to enable/disable htem
+        List of intents and whether to enable/disable them
 
     site_id: str = "default"
         Id of site to configure
