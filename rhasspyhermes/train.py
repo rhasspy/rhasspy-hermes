@@ -9,30 +9,34 @@ from .base import Message
 class IntentGraphRequest(Message):
     """Request publication of intent graph from training.
 
-    The corresponding MQTT message has the following properties:
+    .. admonition:: MQTT message
 
-    Topic: ``rhasspy/train/getIntentGraph``
+      Topic
+        ``rhasspy/train/getIntentGraph``
 
-    Payload (JSON):
+      Payload (JSON)
+        .. list-table::
+          :widths: 10 10 80
+          :header-rows: 1
 
-    .. list-table::
-      :widths: 10 10 80
-      :header-rows: 1
+          * - Key
+            - Type
+            - Description
+          * - id
+            - String
+            - Unique id for request. Appended to reply topic (:class:`IntentGraph`).
+          * - siteId
+            - String
+            - The id of the site where training occurred. Defaults to ``"default"``.
 
-      * - Key
-        - Type
-        - Description
-      * - id
-        - string
-        - Unique id for request. Appended to reply topic (:class:`IntentGraph`).
-      * - siteId
-        - string
-        - The id of the site where training occurred. Defaults to ``"default"``.
+      Publish this message type with ``mosquitto_pub``:
+
+      .. code-block:: shell
+
+        mosquitto_pub -h <HOSTNAME> -t 'rhasspy/train/getIntentGraph' -m '{"id": "abcd", "siteId": "default"}'
 
     Example
     -------
-
-    In Python:
 
     >>> from rhasspyhermes.train import IntentGraphRequest
     >>> request = IntentGraphRequest(id='abcd')
@@ -40,12 +44,6 @@ class IntentGraphRequest(Message):
     '{"id": "abcd", "siteId": "default"}'
     >>> request.topic()
     'rhasspy/train/getIntentGraph'
-
-    Publish this message type with ``mosquitto_pub``:
-
-    .. code-block:: shell
-
-      mosquitto_pub -h <HOSTNAME> -t 'rhasspy/train/getIntentGraph' -m '{"id": "abcd", "siteId": "default"}'
 
     Note
     ----
@@ -73,22 +71,21 @@ class IntentGraphRequest(Message):
 class IntentGraph(Message):
     """Intent graph from training.
 
-    The corresponding MQTT message has the following properties:
+    .. admonition:: MQTT message
 
-    Topic: ``rhasspy/train/intentGraph``
+      Topic
+        ``rhasspy/train/intentGraph``
 
-    Payload (binary): gzipped pickle bytes containing a NetworkX_ intent graph
+      Payload (binary)
+        gzipped pickle bytes containing a NetworkX_ intent graph
 
-    .. _NetworkX: https://networkx.github.io/
+      .. _NetworkX: https://networkx.github.io/
 
-    Example
-    -------
+      Subscribe to this message type with ``mosquitto_sub`` and show the binary payload as hexadecimal numbers:
 
-    Subscribe to this message type with ``mosquitto_sub`` and show the binary payload as hexadecimal numbers:
+      .. code-block:: shell
 
-    .. code-block:: shell
-
-      mosquitto_sub -h <HOSTNAME> -t 'rhasspy/train/intentGraph' -F %x
+        mosquitto_sub -h <HOSTNAME> -t 'rhasspy/train/intentGraph' -F %x
 
     Note
     ----
