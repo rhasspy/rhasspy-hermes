@@ -689,7 +689,13 @@ class NluTrain(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic for this message type."""
+        """Get MQTT topic for this message type.
+
+        Returns
+        -------
+        str
+            ``"rhasspy/nlu/{site_id}/train"``
+        """
         site_id = kwargs.get("site_id", "+")
         return f"rhasspy/nlu/{site_id}/train"
 
@@ -751,7 +757,13 @@ class NluTrainSuccess(Message):
 
     @classmethod
     def topic(cls, **kwargs) -> str:
-        """Get MQTT topic for this message type."""
+        """Get MQTT topic for this message type.
+
+        Returns
+        -------
+        str
+            ``"rhasspy/nlu/{site_id}/trainSuccess"``
+        """
         site_id = kwargs.get("site_id", "+")
         return f"rhasspy/nlu/{site_id}/trainSuccess"
 
