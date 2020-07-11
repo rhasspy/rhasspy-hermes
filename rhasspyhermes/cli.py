@@ -1,4 +1,4 @@
-"""Methods for command-line parsing."""
+"""Methods for command-line parsing of a Rhasspy Hermes client."""
 import argparse
 import logging
 import os
@@ -8,7 +8,11 @@ import paho.mqtt.client as mqtt
 
 
 def add_hermes_args(parser: argparse.ArgumentParser):
-    """Add shared Hermes/MQTT command-line arguments."""
+    """Add shared Hermes/MQTT command-line arguments.
+
+    These are useful arguments for every Hermes client, concerning the connection,
+    authentication, site IDs, debugging and logging.
+    """
     parser.add_argument(
         "--host", default="localhost", help="MQTT host (default: localhost)"
     )
@@ -57,7 +61,7 @@ def setup_logging(args: argparse.Namespace):
 
 
 def connect(client: mqtt.Client, args: argparse.Namespace):
-    """Connect to MQTT broker."""
+    """Connect to an MQTT broker with supplied arguments."""
     if args.username:
         client.username_pw_set(args.username, args.password)
 
