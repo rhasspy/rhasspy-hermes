@@ -18,7 +18,7 @@ class NluQuery(Message):
       Topic
         ``hermes/nlu/query``
 
-      Payload (JSON):
+      Payload (JSON)
         .. list-table::
           :widths: 10 10 80
           :header-rows: 1
@@ -135,7 +135,7 @@ class NluIntentParsed(Message):
       Topic
         ``hermes/nlu/intentParsed``
 
-      Payload (JSON):
+      Payload (JSON)
         .. list-table::
           :widths: 10 10 80
           :header-rows: 1
