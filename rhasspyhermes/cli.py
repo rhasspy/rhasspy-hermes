@@ -34,7 +34,9 @@ def add_hermes_args(parser: argparse.ArgumentParser):
         choices=["CERT_REQUIRED", "CERT_OPTIONAL", "CERT_NONE"],
         help="MQTT TLS certificate requirements for broker (default: CERT_REQUIRED)",
     )
-    parser.add_argument("--tls-version", type=int, help="MQTT TLS version (default: highest)")
+    parser.add_argument(
+        "--tls-version", type=int, help="MQTT TLS version (default: highest)"
+    )
     parser.add_argument("--tls-ciphers", help="MQTT TLS ciphers to use")
 
     parser.add_argument(
