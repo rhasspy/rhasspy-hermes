@@ -263,3 +263,80 @@ class Hotwords(Message):
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
         return "rhasspy/hotword/hotwords"
+
+
+@dataclass
+class RecordHotwordExample(Message):
+    """Request to record examples of a hotword.
+
+    Attributes
+    ----------
+    id: str
+        Unique id used in response topic
+
+    site_id: str = "default"
+        Id of site where hotword component exists
+    """
+
+    id: str
+    site_id: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic"""
+        return "rhasspy/hotword/recordExample"
+
+
+@dataclass
+class HotwordExampleRecorded(Message):
+    """Response when a hotword example has been recorded.
+
+    Attributes
+    ----------
+    wav_bytes: bytes
+        Audio from recorded sample in WAV format
+    """
+
+    TOPIC_PATTERN = re.compile(r"^rhasspy/hotword/([^/]+)/exampleRecorded/([^/]+)$")
+
+    wav_bytes: bytes
+
+    def payload(self) -> typing.Union[str, bytes]:
+        """Get binary/string for this message."""
+        return self.wav_bytes
+
+    @classmethod
+    def is_binary_payload(cls) -> bool:
+        """True if payload is not JSON."""
+        return True
+
+    @classmethod
+    def is_site_in_topic(cls) -> bool:
+        """True if site id is in topic."""
+        return True
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get topic for message."""
+        site_id = kwargs.get("site_id", "+")
+        request_id = kwargs.get("request_id", "#")
+        return f"rhasspy/hotword/{site_id}/exampleRecorded/{request_id}"
+
+    @classmethod
+    def get_site_id(cls, topic: str) -> typing.Optional[str]:
+        """Get site id from a topic"""
+        match = re.match(HotwordExampleRecorded.TOPIC_PATTERN, topic)
+        assert match, "Not an exampleRecorded topic"
+        return match.group(1)
+
+    @classmethod
+    def get_request_id(cls, topic: str) -> str:
+        """Get request id from a topic"""
+        match = re.match(HotwordExampleRecorded.TOPIC_PATTERN, topic)
+        assert match, "Not an exampleRecorded topic"
+        return match.group(2)
+
+    @classmethod
+    def is_topic(cls, topic: str) -> bool:
+        """True if topic matches template"""
+        return re.match(HotwordExampleRecorded.TOPIC_PATTERN, topic) is not None

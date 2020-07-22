@@ -337,7 +337,10 @@ class HermesClient:
                 # Don't log audio frames
                 if not isinstance(message, (AudioFrame, AudioSessionFrame)):
                     self.logger.debug(
-                        "-> %s(%s byte(s))", message.__class__.__name__, len(payload)
+                        "-> %s(%s byte(s)) to %s",
+                        message.__class__.__name__,
+                        len(payload),
+                        topic,
                     )
             else:
                 # Log most JSON messages
