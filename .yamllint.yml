@@ -1,9 +1,0 @@
----
-extends: default
-
-ignore: |
-  .venv/
-  src/
-
-rules:
-  line-length: disable

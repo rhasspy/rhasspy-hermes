@@ -1,2 +1,0 @@
-dataclasses-json==0.4.2
-paho-mqtt==1.5.0
