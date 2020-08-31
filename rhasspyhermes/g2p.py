@@ -54,7 +54,7 @@ class G2pPronounce(Message):
     >>> from rhasspyhermes.g2p import G2pPronounce
     >>> p = G2pPronounce(words=["word", "sentence"], id="test")
     >>> p.payload()
-'{"words": ["word", "sentence"], "id": "test", "siteId": "default", "sessionId": null, "numGuesses": 5}'
+    '{"words": ["word", "sentence"], "id": "test", "siteId": "default", "sessionId": null, "numGuesses": 5}'
     >>> p.topic()
     'rhasspy/g2p/pronounce'
 
