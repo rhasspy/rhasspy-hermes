@@ -179,7 +179,7 @@ def publish(client, message: Message, **topic_args):
     try:
         _LOGGER.debug("-> %s", message)
         topic = message.topic(**topic_args)
-        payload = json.dumps(dataclasses.asdict(message))
+        payload = json.dumps(dataclasses.asdict(message), ensure_ascii=False)
         _LOGGER.debug("Publishing %s char(s) to %s", len(payload), topic)
         client.publish(topic, payload)
     except Exception:
@@ -200,7 +200,7 @@ def print_json(args, topic: str, message: Message):
     if args.print_topics:
         print(topic, end=" ")
 
-    json.dump(dataclasses.asdict(message), sys.stdout)
+    json.dump(dataclasses.asdict(message), sys.stdout, ensure_ascii=False)
     print("")
     sys.stdout.flush()
 
