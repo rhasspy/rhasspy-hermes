@@ -34,7 +34,7 @@ class Message(DataClassJsonMixin, metaclass=ABCMeta):
         >>> on.payload()
         '{"siteId": "satellite"}'
         """
-        return self.to_json()
+        return self.to_json(ensure_ascii=False)
 
     @classmethod
     def get_site_id(cls, topic: str) -> typing.Optional[str]:
