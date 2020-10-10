@@ -373,6 +373,8 @@ class DialogueContinueSession(Message):
 
     session_id: str
     """The id of the session to continue."""
+    site_id: str = "default"
+    """The id of the site where to continue the session."""
     custom_data: typing.Optional[str] = None
     """An update to the session's custom data. If not provided, the custom data
     will stay the same."""
@@ -466,6 +468,8 @@ class DialogueEndSession(Message):
 
     session_id: str
     """The id of the session to end."""
+    site_id: str = "default"
+    """The id of the site where to end the session."""
     text: typing.Optional[str] = None
     """The text the TTS should say to end the session."""
     custom_data: typing.Optional[str] = None
