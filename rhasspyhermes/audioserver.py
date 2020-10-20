@@ -127,6 +127,11 @@ class AudioPlayBytes(Message):
         return True
 
     @classmethod
+    def is_session_in_topic(cls) -> bool:
+        """True if session id is in topic."""
+        return True
+
+    @classmethod
     def topic(cls, **kwargs) -> str:
         """Get topic for message."""
         site_id = kwargs.get("site_id", "+")
@@ -146,6 +151,11 @@ class AudioPlayBytes(Message):
         match = re.match(AudioPlayBytes.TOPIC_PATTERN, topic)
         assert match, "Not a playBytes topic"
         return match.group(2)
+
+    @classmethod
+    def get_session_id(cls, topic: str) -> str:
+        """Get session id from a topic"""
+        return AudioPlayBytes.get_request_id(topic)
 
     @classmethod
     def is_topic(cls, topic: str) -> bool:
