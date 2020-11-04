@@ -78,6 +78,8 @@ class TtsSay(Message):
     response message :class:`TtsSayFinished`."""
     session_id: typing.Optional[str] = None
     """The id of the session, if there is an active session."""
+    volume: typing.Optional[float] = None
+    """Volume scale to apply to generated audio (0-1)"""
 
     @classmethod
     def topic(cls, **kwargs) -> str:
