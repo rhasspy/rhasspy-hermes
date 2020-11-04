@@ -388,3 +388,25 @@ class AsrAudioCaptured(Message):
         match = re.match(AsrAudioCaptured.TOPIC_PATTERN, topic)
         assert match, "Not an audioCaptured topic"
         return match.group(2)
+
+
+@dataclass
+class AsrRecordingFinished(Message):
+    """Sent after silence has been detected, and before transcription occurs.
+
+    Attributes
+    ----------
+    site_id: str = "default"
+        The id of the site where the ASR is listening
+
+    session_id: Optional[str] = None
+        The id of the session, if there is an active session
+    """
+
+    site_id: str = "default"
+    session_id: typing.Optional[str] = None
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        return "rhasspy/asr/recordingFinished"
