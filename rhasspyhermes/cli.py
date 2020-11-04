@@ -74,6 +74,8 @@ def connect(client: mqtt.Client, args: argparse.Namespace):
             # Use highest TLS version
             args.tls_version = ssl.PROTOCOL_TLS
 
+        if args.tls_ca_certs is not None:
+            args.tls_ca_certs = os.path.expandvars(args.tls_ca_certs)
         if args.tls_certfile is not None:
             args.tls_certfile = os.path.expandvars(args.tls_certfile)
         if args.tls_keyfile is not None:
