@@ -553,3 +553,26 @@ class AudioPlayError(Message):
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
         return "hermes/error/audioServer/play"
+
+
+@dataclass
+class AudioSetVolume(Message):
+    """Set audio output volume at a site
+
+    Attributes
+    ----------
+    volume: float
+        The volume scale to set (0 = off, 1 = full volume)
+
+    site_id: str = "default"
+        The id of the site where the error occurred
+
+    """
+
+    volume: float
+    site_id: str = "default"
+
+    @classmethod
+    def topic(cls, **kwargs) -> str:
+        """Get MQTT topic for this message type."""
+        return "rhasspy/audioServer/setVolume"
