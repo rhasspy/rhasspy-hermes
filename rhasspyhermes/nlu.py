@@ -48,6 +48,11 @@ class NluQuery(Message):
           * - lang
             - String (optional)
             - The language of the session.
+          * - customData
+            - String (optional)
+            - Custom data provided by message that started (:class:`rhasspyhermes.dialogue.DialogueStartSession`),
+              continued (:class:`rhasspyhermes.dialogue.DialogueContinueSession`) or
+              ended (:class:`rhasspyhermes.dialogue.DialogueEndSession`) the session.
 
       Publish this message type with ``mosquitto_pub``:
 
@@ -61,7 +66,7 @@ class NluQuery(Message):
     >>> from rhasspyhermes.nlu import NluQuery
     >>> query = NluQuery(input='what time is it')
     >>> query.payload()
-    '{"input": "what time is it", "siteId": "default", "id": null, "intentFilter": null, "sessionId": null, "wakewordId": null, "lang": null}'
+    '{"input": "what time is it", "siteId": "default", "id": null, "intentFilter": null, "sessionId": null, "wakewordId": null, "lang": null, "customData": null}'
     >>> query.topic()
     'hermes/nlu/query'
     """
@@ -104,6 +109,16 @@ class NluQuery(Message):
     """
     lang: typing.Optional[str] = None
     """Optional language of the session.
+
+    Note
+    ----
+
+    This is a Rhasspy-only attribute.
+    """
+    custom_data: typing.Optional[str] = None
+    """Custom data provided by message that started (:class:`rhasspyhermes.dialogue.DialogueStartSession`),
+    continued (:class:`rhasspyhermes.dialogue.DialogueContinueSession`) or
+    ended (:class:`rhasspyhermes.dialogue.DialogueEndSession`) the session.
 
     Note
     ----
