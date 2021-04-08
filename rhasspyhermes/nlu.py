@@ -133,6 +133,15 @@ class NluQuery(Message):
 
     This is a Rhasspy-only attribute.
     """
+    custom_entities: typing.Optional[typing.Dict[str, typing.Any]] = None
+    """User-defined entities to be set in the recognized intent.
+    Copied by the dialogue manager into subsequent ASR and NLU messages.
+
+    Note
+    ----
+
+    This is a Rhasspy-only attribute.
+    """
 
     @classmethod
     def topic(cls, **kwargs) -> str:
