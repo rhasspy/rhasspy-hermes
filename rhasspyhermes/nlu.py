@@ -125,6 +125,14 @@ class NluQuery(Message):
 
     This is a Rhasspy-only attribute.
     """
+    asr_confidence: typing.Optional[float] = None
+    """Speech recognizer confidence score between 0 and 1 (1 being sure).
+
+    Note
+    ----
+
+    This is a Rhasspy-only attribute.
+    """
 
     @classmethod
     def topic(cls, **kwargs) -> str:
