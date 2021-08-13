@@ -367,7 +367,7 @@ class AsrAudioCaptured(Message):
     def topic(cls, **kwargs) -> str:
         """Get MQTT topic for this message type."""
         site_id = kwargs.get("site_id", "+")
-        session_id = kwargs.get("site_id", "+")
+        session_id = kwargs.get("session_id", "+")
         return f"rhasspy/asr/{site_id}/{session_id}/audioCaptured"
 
     @classmethod
