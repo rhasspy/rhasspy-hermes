@@ -2,7 +2,7 @@ Sphinx==3.0.4
 black==19.10b0
 coverage==5.0.4
 flake8==3.7.9
-lxml==4.6.3
+lxml==4.6.5
 mypy==0.770
 pyinstaller==3.6
 pylint==2.4.4
