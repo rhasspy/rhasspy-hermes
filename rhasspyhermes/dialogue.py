@@ -147,7 +147,7 @@ class DialogueStartSession(Message):
     This is a Rhasspy-only attribute.
     """
 
-    # pylint: disable=W0221
+    # pylint: disable=W0221,W0237
     @classmethod
     def from_dict(
         cls: typing.Type["DialogueStartSession"],

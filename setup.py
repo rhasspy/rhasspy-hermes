@@ -11,7 +11,7 @@ this_dir = Path(__file__).parent
 long_description: str = ""
 readme_path = this_dir / "README.rst"
 if readme_path.is_file():
-    long_description = readme_path.read_text()
+    long_description = readme_path.read_text(encoding="utf-8")
 
 requirements_path = this_dir / "requirements.txt"
 with open(requirements_path, "r", encoding="utf-8") as requirements_file:
@@ -34,6 +34,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
     ],
     long_description=long_description,
