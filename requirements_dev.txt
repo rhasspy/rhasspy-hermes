@@ -5,7 +5,7 @@ flake8==3.7.9
 lxml==4.6.5
 mypy==0.770
 pyinstaller==3.6
-pylint==2.4.4
+pylint==2.12.2
 pytest==5.4.1
 pytest-cov==2.8.1
 rstcheck==3.3.1
