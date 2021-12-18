@@ -298,7 +298,7 @@ def transcribe(args, client, site_id):
 
 def recognize(args, client, site_id):
     """Recognize intent(s) from one or more sentences using hermes/nlu"""
-    from .nlu import NluQuery, NluIntent, NluIntentNotRecognized, NluError
+    from .nlu import NluError, NluIntent, NluIntentNotRecognized, NluQuery
 
     client.subscribe(NluIntent.topic(intent_name="#"))
     client.subscribe(NluIntentNotRecognized.topic())
@@ -461,7 +461,7 @@ def speak(args, client, site_id):
 
 def wake(args, client, site_id):
     """Wait until wake word is detected"""
-    from .wake import HotwordToggleOn, HotwordDetected, HotwordToggleOff
+    from .wake import HotwordDetected, HotwordToggleOff, HotwordToggleOn
 
     assert args.wakeword_id, "No wake word ids"
     for wakeword_id in args.wakeword_id:
