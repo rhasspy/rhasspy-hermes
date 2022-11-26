@@ -119,7 +119,6 @@ class HermesClient:
 
                 self.pending_mqtt_topics.clear()
 
-    # pylint: disable=no-self-use
     async def on_message(
         self,
         message: Message,
@@ -130,7 +129,6 @@ class HermesClient:
         """Override to handle Hermes messages."""
         yield None
 
-    # pylint: disable=no-self-use
     async def on_message_blocking(
         self,
         message: Message,
