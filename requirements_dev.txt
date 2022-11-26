@@ -6,7 +6,7 @@ isort==5.10.1
 lxml==4.9.1
 mypy==0.920
 pyinstaller==3.6
-pylint==2.12.2
+pylint==2.15.6
 pytest==6.2.5
 pytest-cov==3.0.0
 rstcheck==3.3.1
